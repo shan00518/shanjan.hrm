@@ -17,7 +17,8 @@ export async function GET() {
         }));
 
         return success({ projects });
-    } catch (error: any) {
-        return internalServerError(error.message);
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'An unexpected error occurred';
+        return internalServerError(message);
     }
 }

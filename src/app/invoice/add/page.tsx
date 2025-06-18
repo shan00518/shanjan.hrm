@@ -18,11 +18,11 @@ type InvoiceItem = {
 };
 
 type ProjectOption = {
-  [x: string]: string;
   id: string;
   name: string;
   price: number;
 };
+
 
 type ClientOption = {
   id: string;

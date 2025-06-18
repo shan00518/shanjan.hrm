@@ -1,23 +1,25 @@
 import { connectDB } from '@/lib/database';
 import { success, notFound, internalServerError } from '@/lib/response-mapper';
-import {Invoice} from '@/models/invoice';
+import { Invoice } from '@/models/invoice';
 import { NextRequest } from 'next/server';
 
 export async function DELETE(
-    _: NextRequest,
-    { params }: { params: Promise<{ invoiceId: string }> }
+  _: NextRequest,
+  { params }: { params: Promise<{ invoiceId: string }> }
 ) {
-    try {
-        await connectDB();
-        const { invoiceId } = await params;
+  try {
+    await connectDB();
+    const { invoiceId } = await params;
 
-        const invoice = await Invoice.findById(invoiceId);
-        if (!invoice) return notFound('Invoice not found');
+    const invoice = await Invoice.findById(invoiceId);
+    if (!invoice) return notFound('Invoice not found');
 
-        await invoice.deleteOne();
+    await invoice.deleteOne();
 
-        return success({}, 'Invoice deleted successfully');
-    } catch (err: any) {
-        return internalServerError(err.message);
-    }
+    return success({}, 'Invoice deleted successfully');
+  } catch (err: unknown) {
+    const message =
+      err instanceof Error ? err.message : 'An unexpected error occurred';
+    return internalServerError(message);
+  }
 }

@@ -23,7 +23,7 @@ export async function PUT(
         const location = formData.get('location')?.toString();
         const avatarFile = formData.get('avatar') as Blob | null;
 
-        const updates: Record<string, any> = {};
+        const updates: Record<string, unknown> = {};
 
         if (name) updates.name = name;
         if (email) updates.email = email;
@@ -47,8 +47,11 @@ export async function PUT(
         });
 
         return success({ client: updatedClient }, 'Client updated successfully');
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Client update error:', error);
-        return internalServerError('An error occurred while updating the client');
+        if (error instanceof Error) {
+            return internalServerError(error.message);
+        }
+        return internalServerError('An unexpected error occurred while updating the client');
     }
 }

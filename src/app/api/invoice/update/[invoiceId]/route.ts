@@ -98,8 +98,9 @@ export async function PUT(
         });
 
         return success({ invoice: updatedInvoice }, 'Invoice updated successfully');
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('Invoice update error:', error);
-        return internalServerError(error.message || 'An error occurred while updating the invoice');
+        const message = error instanceof Error ? error.message : 'An unknown error occurred';
+        return internalServerError(message);
     }
 }

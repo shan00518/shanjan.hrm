@@ -13,7 +13,8 @@ export async function GET(
         const project = await Project.findById(projectId).select('price');
         if (!project) return notFound('Project not found');
         return success({ rate: project.price });
-    } catch (error: any) {
-        return internalServerError(error.message);
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Unexpected error occurred';
+        return internalServerError(message);
     }
 }

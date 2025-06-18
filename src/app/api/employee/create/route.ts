@@ -97,7 +97,11 @@ export async function POST(req: NextRequest) {
 
         const newEmp = await Employee.create(payload);
         return success({ employee: newEmp }, 'Employee created');
-    } catch (err: any) {
-        return internalServerError(err.message);
+    } catch (err: unknown) {
+        if (err instanceof Error) {
+            return internalServerError(err.message);
+        }
+        return internalServerError('An unexpected error occurred while creating the employee');
     }
+
 }

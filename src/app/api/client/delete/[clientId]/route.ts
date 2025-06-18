@@ -5,25 +5,28 @@ import { success, notFound, internalServerError } from '@/lib/response-mapper';
 import { deleteFromCloudinary } from '@/lib/cloudinary';
 
 export async function DELETE(
-    _req: NextRequest,
-    { params }: { params: Promise<{ clientId: string }> }
+  _req: NextRequest,
+  { params }: { params: Promise<{ clientId: string }> }
 ) {
-    await connectDB();
+  await connectDB();
 
-    try {
-        const { clientId } = await params;
-        const client = await Client.findById(clientId);
+  try {
+    const { clientId } = await params;
+    const client = await Client.findById(clientId);
 
-        if (!client) return notFound('Client not found');
+    if (!client) return notFound('Client not found');
 
-        if (client.avatar?.publicId) {
-            await deleteFromCloudinary(client.avatar.publicId);
-        }
-
-        await client.deleteOne();
-
-        return success({ message: 'Client deleted successfully' });
-    } catch (error: any) {
-        return internalServerError(error.message);
+    if (client.avatar?.publicId) {
+      await deleteFromCloudinary(client.avatar.publicId);
     }
+
+    await client.deleteOne();
+
+    return success({ message: 'Client deleted successfully' });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return internalServerError(error.message);
+    }
+    return internalServerError('Unknown error occurred');
+  }
 }

@@ -1,41 +1,47 @@
-// app/api/employee/[id]/route.ts
+// app/api/employee/[employeeId]/route.ts
+
 import { NextRequest } from 'next/server';
 import { connectDB } from '@/lib/database';
-import {Employee} from '@/models/employee';
+import { Employee } from '@/models/employee';
 import {
-    success,
-    notFound,
-    badRequest,
-    internalServerError
+  success,
+  notFound,
+  internalServerError
 } from '@/lib/response-mapper';
-import {
-    uploadToCloudinary,
-    deleteFromCloudinary
-} from '@/lib/cloudinary';
+import { deleteFromCloudinary } from '@/lib/cloudinary';
 
 export async function DELETE(
-    _: NextRequest,
-    { params }: { params: Promise<{ employeeId: string }> }
+  _req: NextRequest,
+  { params }: { params: Promise<{ employeeId: string }> }
 ) {
-    await connectDB();
-    try {
-        const { employeeId } = await params;
-        const emp = await Employee.findById(employeeId);
-        if (!emp) return notFound('Employee not found');
+  await connectDB();
 
-        if (emp.avatar?.publicId) {
-            await deleteFromCloudinary(emp.avatar.publicId);
-        }
-        for (const docKey of ['cv', 'appointmentLetter', 'experienceLetter', 'salarySlips'] as const) {
-            const doc = (emp.documents as any)[docKey];
-            if (doc?.publicId) {
-                await deleteFromCloudinary(doc.publicId);
-            }
-        }
+  try {
+    const { employeeId } = await params;
+    const emp = await Employee.findById(employeeId);
+    if (!emp) return notFound('Employee not found');
 
-        await emp.deleteOne();
-        return success({ message: 'Employee deleted' });
-    } catch (err: any) {
-        return internalServerError(err.message);
+    // Delete avatar if exists
+    if (emp.avatar?.publicId) {
+      await deleteFromCloudinary(emp.avatar.publicId);
     }
+
+    // Delete documents from Cloudinary
+    const docKeys = ['cv', 'appointmentLetter', 'experienceLetter', 'salarySlips'] as const;
+
+    for (const docKey of docKeys) {
+      const document = emp.documents?.[docKey] as { publicId?: string } | undefined;
+      if (document?.publicId) {
+        await deleteFromCloudinary(document.publicId);
+      }
+    }
+
+    await emp.deleteOne();
+    return success({ message: 'Employee deleted' });
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return internalServerError(err.message);
+    }
+    return internalServerError('An unexpected error occurred while deleting the employee');
+  }
 }

@@ -4,18 +4,21 @@ import { connectDB } from '@/lib/database';
 import { success, notFound, internalServerError } from '@/lib/response-mapper';
 
 export async function GET(
-    req: NextRequest,
-    { params }: { params: Promise<{ clientId: string }> }
+  req: NextRequest,
+  { params }: { params: Promise<{ clientId: string }> }
 ) {
-    await connectDB();
+  await connectDB();
 
-    try {
-        const { clientId } = await params;
-        const client = await Client.findById(clientId);
-        if (!client) return notFound('Client not found');
+  try {
+    const { clientId } = await params;
+    const client = await Client.findById(clientId);
+    if (!client) return notFound('Client not found');
 
-        return success({ client });
-    } catch (error: any) {
-        return internalServerError(error.message);
+    return success({ client });
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return internalServerError(error.message);
     }
+    return internalServerError('An unknown error occurred');
+  }
 }
