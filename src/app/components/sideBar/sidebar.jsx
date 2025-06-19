@@ -18,10 +18,10 @@ const Sidebar = () => {
   const navItems = [
     { href: "/", label: "Dashboard", icon: RiDashboard3Line },
     { href: "/client", label: "Client", icon: IoPeopleSharp },
-   { href: "/projects", label: "project", icon: GoProjectSymlink
+   { href: "/projects", label: "Project", icon: GoProjectSymlink
  },
 
-    { href: "/developers", label: "Developers", icon: FaLaptop },
+    { href: "/employees", label: "Employees", icon: FaLaptop },
     { href: "/invoice", label: "Invoice", icon: FaFileInvoiceDollar },
     { href: "/timesheet", label: "Timesheet", icon: IoMdTime },
     { href: "/reports", label: "Reports", icon: ImStatsDots },
