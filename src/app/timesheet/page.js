@@ -101,6 +101,7 @@ export default function Timesheet() {
   const [status, setStatus] = useState("On Time");
   const [editingId, setEditingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  
 
   // Pagination settings
   const recordsPerPage = 3;
@@ -417,14 +418,14 @@ export default function Timesheet() {
             </div>
 
             <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <p className="text-sm md:text-md">Showing</p>
                 <select className="w-16 p-1 text-sm md:text-md outline-0 border border-gray-300 rounded-md bg-[#ebebeb]">
                   {[10, 9, 8, 7].map((num) => (
                     <option key={num}>{num}</option>
                   ))}
                 </select>
-              </div>
+              </div> */}
 
               <p className="text-sm md:text-md">
                 Showing {startIndex + 1} to {Math.min(endIndex, clients.length)} of {clients.length} records

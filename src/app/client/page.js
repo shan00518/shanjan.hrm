@@ -9,7 +9,6 @@ export default function ClientsPage() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [clients, setClients] = useState([]);
   const [name, setName] = useState("");
-  const [editingId, setEditingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,7 +48,6 @@ export default function ClientsPage() {
     setPhone("");
     setAvatar(null);
     setAvatarPreview("");
-    setEditingId(null);
   };
 
   const handleAddClient = async (e) => {
