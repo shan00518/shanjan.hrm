@@ -187,12 +187,12 @@ export default function ClientsPage() {
   };
 
   return (
-    <div className="flex w-[10] md:w-[100%]">
-      <aside className="w-[15%] bg-gray-100 hidden md:block p-4">
+    <div className="flex w-[] md:w-[100%]">
+      <aside className="w-[15%]  hidden md:block p-4">
         <p className="font-semibold">Sidebar</p>
       </aside>
 
-      <main className="w-[300] md:w-[70%] lg:w-[73%] xl:w-[80%] 2xl:w-[82%] ml-[-10px] border-[1px] rounded-lg px-6 py-8 xl:mx-auto mt-[100px] md:ml-[100px] lg:ml-[90px] xl:ml-12 2xl:ml-6">
+      <main className="w-[100%] sm:w-[100%] md:w-[70%] lg:w-[73%] xl:w-[80%] 2xl:w-[82%] ml-[-10px] border-[1px] rounded-lg px-6 py-8 xl:mx-auto mt-[100px] md:ml-[100px] lg:ml-[90px] xl:ml-12 2xl:ml-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <h1 className="text-2xl font-bold">Clients</h1>
           <button

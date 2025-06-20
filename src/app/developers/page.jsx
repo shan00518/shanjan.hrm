@@ -127,7 +127,7 @@ const handleInputChange = (e) => {
 
   return (
     <section className="w-[10] md:w-full min-h-screen bg-white pt-20 px-4 md:px-6 lg:pl-64 lg:pt-20">
-      <div className=" absolute w-[290] md:w-[69%] lg:w-[73%] xl:w-[78%]  border border-gray-200 p-4 rounded-xl bg-white  ml-[-20px] md:left-[250px] lg:mt-3 lg:left-72 ">
+      <div className=" absolute w-[100%] md:w-[69%] lg:w-[73%] xl:w-[78%]   p-4 rounded-xl bg-white  ml-[-20px] md:left-[250px] lg:mt-3 lg:left-72 ">
         <div className="border border-gray-200 p-4 rounded-xl">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div className="relative w-full md:w-1/3">

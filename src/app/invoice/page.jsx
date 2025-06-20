@@ -72,13 +72,13 @@ export default function ClientsPage() {
   
   return (
     <div className="flex">
-      <aside className="w-[15%] hidden md:block p-4">
+      <aside className="md:w-[25%] lg:w-[15%]  hidden md:block p-4">
       month: 'short',
         <p className="font-semibold">Sidebar</p>
       </aside>
 
-      <main className="w-full md:w-[70%] lg:w-[73%] xl:w-[80%] 2xl:w-[82%] border-[1px] ml-12 rounded-lg px-6 py-8 mt-[100px]">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+      <main className="w-full md:w-[70%] lg:w-[73%] xl:w-[80%]  2xl:w-[82%] 2xl:ml-6 xl:ml-12 border-[1px]   lg:ml-24 m-auto rounded-lg px-6 py-8 mt-[100px]">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4  ">
           <h1 className="text-2xl font-bold">Invoice Table</h1>
           <div className="flex gap-4">
             <button
