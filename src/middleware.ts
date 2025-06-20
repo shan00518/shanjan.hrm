@@ -57,3 +57,6 @@ export const config = {
         '/((?!_next|favicon.ico|images|fonts|api/public).*)',
     ],
 };
+
+
+
