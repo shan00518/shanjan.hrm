@@ -104,12 +104,12 @@ export default function Reports() {
   );
 
   return (
-    <div className="flex w-[10] md:w-full">
+    <div className="flex w-[] md:w-full">
       <aside className="w-[15%] hidden md:block p-4">
         <p className="font-semibold">Sidebar</p>
       </aside>
 
-      <main className="w-[300] md:w-[70%] lg:w-[73%] xl:w-[80%] 2xl:w-[82%] border-[1px] rounded-lg px-6 py-8 xl:mx-auto mt-[100px] md:mt-16 md:ml-28 lg:ml-26 xl:ml-12 2xl:ml-6">
+      <main className="sm:w-[100%] md:w-[70%] lg:w-[73%] xl:w-[80%] 2xl:w-[82%] border-[1px] rounded-lg px-6 py-8 xl:mx-auto mt-[100px] md:mt-16 md:ml-28 lg:ml-26 xl:ml-12 2xl:ml-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div className="relative w-full sm:w-1/2 mb-4">
             <FaSearch className="absolute top-4 left-3 text-gray-400 text-sm md:text-sm" />
