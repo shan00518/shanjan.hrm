@@ -218,7 +218,7 @@ export default function Document() {
           <hr className="border-[silver]" />
 
           {/* Upload Section */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6 font-bold">
             {[
               { label: "Appointment Letter", key: "appointment" },
               { label: "Salary Slips", key: "salarySlip" },
@@ -229,21 +229,22 @@ export default function Document() {
                 <p className="text-xl md:text-lg lg:text-sm text-[#16151C]">
                   Upload {label}
                 </p>
-                <div className="w-[95%] border-dotted border-2 border-[#192443] py-5 text-sm mt-4 justify-items-center-safe space-y-1">
+                <div className="  w-[95%] border-dotted border-2 border-[#192443] py-5 text-sm mt-4 justify-items-center-safe space-y-1">
                   <Image
                     src="/assets/documents.jpg"
                     alt={label}
                     width={200}
                     height={200}
-                    className="bg-[#7152F3] p-2.5 md:ml-2 xl:ml-36 rounded-md text-center"
+                    className="bg-[#7152F3] p-2.5 rounded-md mx-auto"
                   />
+
                   <input
                     type="file"
                     accept=".jpg,.jpeg,.pdf"
                     onChange={(e) => handleFileChange(e, key)}
-                    className="text-sm mt-2"
+                    className="text-sm mt-2 p-1"
                   />
-                  <p className="text-[#A2A1A8] text-sm">
+                  <p className="text-[#A2A1A8] text-sm p-2">
                     Supported formats: jpeg, pdf
                   </p>
                 </div>
@@ -259,9 +260,8 @@ export default function Document() {
             <button
               onClick={goToNext}
               disabled={!allUploaded}
-              className={`px-5 py-2 rounded-md text-sm text-white ${
-                allUploaded ? "bg-[#7152F3]" : "bg-gray-400 cursor-not-allowed"
-              }`}
+              className={`px-5 py-2 rounded-md text-sm text-white ${allUploaded ? "bg-[#7152F3]" : "bg-gray-400 cursor-not-allowed"
+                }`}
             >
               Next
             </button>

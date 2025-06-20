@@ -232,7 +232,7 @@ export default function Account() {
   return (
     <div className="relative left-40 lg:left-[10px] lg:pl-0 md:pl-56 bg-[#ffff] w-full lg:ml-[0px] ml-[-200px] mt-20 lg:mt-20">
       <div className="justify-items-center-safe pt-17">
-        <div className="lg:w-[75%] w-[100%] md:w-[100%] xl:w-[80%] lg:ml-60 ml-8 bg-[#ffff] border-2 border-[silver] p-3 rounded-xl">
+        <div className=" lg:w-[75%] w-[100%]  md:w-[100%] xl:w-[80%] lg:ml-60 ml-10 bg-[#ffff] border-2 border-[silver] p-3 rounded-xl">
           <div className="grid grid-cols-2 sm:flex gap-3">
             <Link href="/developers/personal">
               <div className="flex items-center sm:p-0 p-1  rounded">

@@ -259,11 +259,11 @@ export default function PersonalInfo() {
   return (
     <div className="bg-white w-full lg:mt-20 mt-16 pl-40 md:pl-[370px] lg:pl-0">
       <div className="justify-items-center pt-17">
-        <div className="lg:w-[75%] md:w-[155%]  w-[155%] xl:w-[80%] lg:ml-60 ml-[-170px] bg-white border-2 border-silver p-3 rounded-xl">
+        <div className=" lg:w-[75%] md:w-[155%]  w-[155%] xl:w-[80%] lg:ml-60 ml-[-170px] bg-white border-2 border-silver p-3 rounded-xl">
           <div className="grid grid-cols-2 sm:flex gap-3">
             <Link href="/developers/personal">
-              <div className="flex items-center sm:p-0 p-1  rounded">
-                <FaUser className="md:size-4 lg:size-4 size-4 text-[#7152F3]" />
+              <div className="flex items-center gap-1    rounded">
+                <FaUser className=" md:size-4 lg:size-4 size- text-[#7152F3]" />
                 <h1 className="text-xs md:text-xs lg:text-sm text-[#7152F3]">
                   Personal Information
                 </h1>

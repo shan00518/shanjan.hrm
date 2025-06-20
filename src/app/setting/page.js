@@ -1,60 +1,82 @@
 
-"use client";
-import React from "react";
 
-const Settings = () => {
+"use client";
+import React, { useState } from "react";
+
+const SettingsPage = () => {
+  const [settings, setSettings] = useState({
+    appearance: "Light",
+    language: "English",
+    twoFactorAuth: true,
+    mobilePushNotifications: true,
+    desktopNotifications: true,
+    emailNotifications: true,
+  });
+
   const settingsOptions = [
     {
+      id: "appearance",
       title: "Appearance",
       description: "Customize how your theme looks on your device",
       type: "select",
       options: ["Light", "Dark"],
-      defaultValue: "Light",
     },
     {
+      id: "language",
       title: "Language",
       description: "Select your language",
       type: "select",
       options: ["English", "Hindi", "French", "Russian", "Urdu", "Punjabi"],
-      defaultValue: "English",
     },
     {
+      id: "twoFactorAuth",
       title: "Two-factor Authentication",
       description: "Keep your account secure by enabling 2FA via mail",
       type: "toggle",
-      defaultValue: true,
     },
     {
+      id: "mobilePushNotifications",
       title: "Mobile Push Notifications",
       description: "Receive push notification",
       type: "toggle",
-      defaultValue: true,
     },
     {
+      id: "desktopNotifications",
       title: "Desktop",
       description: "Receive push notification in desktop",
       type: "toggle",
-      defaultValue: true,
     },
     {
+      id: "emailNotifications",
       title: "Email Notifications",
       description: "Receive email notification",
       type: "toggle",
-      defaultValue: true,
     },
   ];
 
-  
+  const handleToggleChange = (id) => {
+    setSettings((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const handleSelectChange = (id, value) => {
+    setSettings((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
 
   return (
-    <section className="px-4 py-6 sm:px-6 lg:px-8 mx-auto w-[full] max-w-screen-sm   mt-12 md:mt-20 lg:mt-24 xl:mt-16">
-      <div className="border border-gray-200 rounded-xl p-4 lg:p-8 xl:w-[180%]  lg:w-[750px] lg:ml-4 md:w-[450px] md:ml-44 xl:ml-[-110px] ">
+    <section className="px-4 py-6 sm:px-6 lg:px-8 mx-auto w-full max-w-screen-sm mt-12">
+      <div className="border border-gray-200 rounded-xl p-4 lg:p-8 2xl:w-[217%] xl:w-[195%] lg:w-[750px] lg:ml-4 md:w-[450px] md:ml-44 2xl:ml-[-210px] xl:ml-[-160px]">
         <h1 className="text-2xl sm:text-2xl font-bold mb-6 lg:mb-8">Settings</h1>
         
         <div className="space-y-6 lg:space-y-8">
-          {settingsOptions.map((item, i) => (
+          {settingsOptions.map((item) => (
             <div
-              key={i}
+              key={item.id}
               className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-gray-200 last:border-b-0 last:pb-0"
             >
               <div className="flex-1 min-w-0">
@@ -70,7 +92,8 @@ const Settings = () => {
                 {item.type === "select" ? (
                   <div className="relative w-full sm:w-40 lg:w-44 xl:w-48">
                     <select
-                      defaultValue={item.defaultValue}
+                      value={settings[item.id]}
+                      onChange={(e) => handleSelectChange(item.id, e.target.value)}
                       className="appearance-none w-full cursor-pointer px-4 py-2 bg-gray-50 text-gray-800 text-sm sm:text-base lg:text-sm xl:text-base rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-gray-300"
                     >
                       {item.options.map((option) => (
@@ -96,15 +119,19 @@ const Settings = () => {
                     </div>
                   </div>
                 ) : (
-                  <label className="relative inline-flex items-center cursor-pointer md:ml-28 ">
-                    <input 
-                      type="checkbox" 
-                      defaultChecked={item.defaultValue} 
-                      className="sr-only peer" 
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={settings[item.id]}
+                      onChange={() => handleToggleChange(item.id)}
+                      className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-checked:bg-green-500 rounded-full peer peer-focus:ring-2 peer-focus:ring-green-300 transition-all duration-300">
-                      <div className="absolute left-0.5 top-0.5 w-5 h-5 bg-white rounded-full transition-transform duration-300 peer-checked:translate-x-full"></div>
+                    <div className={`w-11 h-6 rounded-full peer ${settings[item.id] ? 'bg-green-500' : 'bg-gray-200'}`}>
+                      <div className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full transition-transform ${settings[item.id] ? 'translate-x-5' : 'translate-x-0'} bg-white`}></div>
                     </div>
+                    <span className="ml-2 text-sm font-medium text-gray-700">
+                      {settings[item.id] ? 'ON' : 'OFF'}
+                    </span>
                   </label>
                 )}
               </div>
@@ -116,4 +143,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default SettingsPage;
