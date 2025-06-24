@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { RiPencilFill } from "react-icons/ri";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { BiExport } from "react-icons/bi";
+import { toast } from "react-toastify";
+
 import { useRouter } from "next/navigation";
 
 export default function ClientsPage() {
@@ -28,9 +30,13 @@ export default function ClientsPage() {
         }
         const data = await response.json();
         setInvoices(data.invoices || []);
+                toast.success("Invoices loaded successfully!");
+
       } catch (err) {
         console.error("Failed to fetch invoices:", err);
         setError("Failed to load invoices.");
+        toast.error("Error loading invoices.");
+
       } finally {
         setLoading(false);
       }
@@ -55,9 +61,11 @@ export default function ClientsPage() {
 
       setDeleteTarget(null);
       setShowDeleteModal(false);
+            toast.success("Invoice deleted successfully.");
+
     } catch (err) {
       console.error("Error deleting invoice:", err);
-      alert("Failed to delete invoice. Please try again.");
+      toast.error("Failed to delete invoice.");
     }
   };
 

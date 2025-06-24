@@ -1,204 +1,151 @@
+
+
+
 "use client";
 
-import { useState } from "react";
-import { Check } from "lucide-react";
+import { useState, useEffect } from "react";
 import { RiPencilFill } from "react-icons/ri";
 import { FaChevronLeft, FaChevronRight, FaRegTrashAlt, FaSearch } from "react-icons/fa";
 
 export default function Timesheet() {
-  
   const [activePage, setActivePage] = useState(1);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedClient, setSelectedClient] = useState(null);
-  const [clients, setClients] = useState([
-    {
-      id: 1,
-      name: "Leasie",
-      email: "alikhan@example.com",
-      role: "Project Manager",
-      designation: "Website",
-      type: "Office",
-      check: "11:10",
-      status: "On Time",
-    },
-    {
-      id: 2,
-      name: "John",
-      role: "Developer",
-      designation: "Mobile App",
-      type: "Remote",
-      check: "10:10",
-      status: "Off Time",
-    },
-    {
-      id: 3,
-      name: "Sarah",
-      role: "Designer",
-      designation: "UI/UX",
-      type: "Office",
-      check: "10:50",
-      status: "On Time",
-    },
-    {
-      id: 4,
-      name: "Mike",
-      role: "QA Engineer",
-      designation: "Testing",
-      type: "Remote",
-      check: "09:30",
-      status: "On Time",
-    },
-    {
-      id: 5,
-      name: "Emily",
-      role: "Product Manager",
-      designation: "Website",
-      type: "Office",
-      check: "09:00",
-      status: "On Time",
-    },
-    {
-      id: 6,
-      name: "David",
-      role: "Backend Developer",
-      designation: "API",
-      type: "Remote",
-      check: "10:15",
-      status: "Off Time",
-    },
-    {
-      id: 7,
-      name: "Lisa",
-      role: "Frontend Developer",
-      designation: "Website",
-      type: "Office",
-      check: "09:45",
-      status: "On Time",
-    },
-    {
-      id: 8,
-      name: "Robert",
-      role: "DevOps",
-      designation: "Infrastructure",
-      type: "Remote",
-      check: "11:30",
-      status: "Off Time",
-    },
-    {
-      id: 9,
-      name: "Anna",
-      role: "Data Analyst",
-      designation: "Reports",
-      type: "Office",
-      check: "10:00",
-      status: "On Time",
-    }
-  ]);
+  const [employeeId, setEmployeeId] = useState("");
 
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [timesheetEntries, setTimesheetEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Form states (simplified to focus on time)
   const [name, setName] = useState("");
-  const [designation, setDesignation] = useState("");
-  const [type, setType] = useState("");
-  const [check, setCheck] = useState("");
+  const [checkInTime, setCheckInTime] = useState("");
   const [status, setStatus] = useState("On Time");
   const [editingId, setEditingId] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-
-
+  const [employees, setEmployees] = useState([]);
 
   // Pagination settings
-  const recordsPerPage = 3;
-   const startIndex = (activePage - 1) * recordsPerPage;
+  const recordsPerPage = 10;
+  const startIndex = (activePage - 1) * recordsPerPage;
   const endIndex = startIndex + recordsPerPage;
-const filteredClients = clients.filter((client, index) => {
-  const srNo = index + 1; // Global Sr. No.
-  const search = searchTerm.toLowerCase();
-  return (
-    client.name.toLowerCase().includes(search) ||
-    client.designation.toLowerCase().includes(search) ||
-    client.type.toLowerCase().includes(search) ||
-    // client.check.toLowerCase().includes(search) ||
-    client.status.toLowerCase().includes(search) ||
-    srNo.toString().includes(search) // ✅ Sr. No included in search
-  );
-});
 
 
- const totalPages = Math.ceil(filteredClients.length / recordsPerPage);
-const currentClients = filteredClients.slice(startIndex, endIndex);
 
+
+  useEffect(() => {
+  const fetchEmployees = async () => {
+    try {
+      const response = await fetch('/api/employee/list');
+      if (!response.ok) {
+        throw new Error('Failed to fetch employees');
+      }
+      const data = await response.json();
+
+      if (!data.employees || !Array.isArray(data.employees)) {
+        throw new Error('Invalid data format received from API');
+      }
+
+      // Store employees in state for select dropdown
+      setEmployees(data.employees);
+
+      // Optional: also prepare default timesheet view
+      const entries = data.employees.map(employee => ({
+        id: employee._id,
+        name: `${employee.firstName} ${employee.lastName}`,
+        checkInTime: "09:00",
+        status: "On Time",
+      }));
+
+      setTimesheetEntries(entries);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  fetchEmployees();
+}, []);
+
+
+  // Filter timesheet entries based on search term
+  const filteredEntries = timesheetEntries.filter((entry, index) => {
+    const srNo = index + 1;
+    const search = searchTerm.toLowerCase();
+    return (
+      (entry.name && entry.name.toLowerCase().includes(search)) ||
+      (entry.checkInTime && entry.checkInTime.toLowerCase().includes(search)) ||
+      (entry.status && entry.status.toLowerCase().includes(search)) ||
+      srNo.toString().includes(search)
+    );
+  });
+
+  const totalPages = Math.ceil(filteredEntries.length / recordsPerPage);
+  const currentEntries = filteredEntries.slice(startIndex, endIndex);
 
   const resetForm = () => {
     setName("");
-    setDesignation("");
-    setType("");
-    setCheck("");
+    setCheckInTime("");
     setStatus("On Time");
     setEditingId(null);
   };
 
-  const handleAddClient = (e) => {
+  const handleAddEntry = (e) => {
     e.preventDefault();
-    const newClient = {
-      id: Date.now(),
+    const newEntry = {
+      id: Date.now().toString(),
       name,
-      email: `${name.toLowerCase().replace(/\s+/g, "")}@example.com`,
-      role: "Project Manager",
-      designation,
-      type,
-      check,
+      checkInTime,
       status,
     };
-    setClients((prev) => [...prev, newClient]);
+    setTimesheetEntries((prev) => [...prev, newEntry]);
     resetForm();
     setShowAddModal(false);
-    // If adding a new client causes a new page to be needed, go to that page
-    if (clients.length % recordsPerPage === 0) {
-      setActivePage(Math.ceil((clients.length + 1) / recordsPerPage));
+    if (timesheetEntries.length % recordsPerPage === 0) {
+      setActivePage(Math.ceil((timesheetEntries.length + 1) / recordsPerPage));
     }
   };
 
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    setClients((prev) =>
-      prev.map((client) =>
-        client.id === editingId
-          ? { ...client, name, designation, type, check, status }
-          : client
-      )
-    );
-    resetForm();
+  
+
+  const handleEditEntry = (entry) => {
+    setEditingId(entry.id);
+    setName(entry.name);
+    setCheckInTime(entry.checkInTime);
+    setStatus(entry.status);
   };
 
-  const handleEditClient = (client) => {
-    setEditingId(client.id);
-    setName(client.name);
-    setDesignation(client.designation);
-    setType(client.type);
-    setCheck(client.check);
-    setStatus(client.status);
-  };
-
-  const handleDeleteClient = () => {
-    // Check if deleting the last item on the current page
-    const isLastItemOnPage = currentClients.length === 1;
+  const handleDeleteEntry = () => {
+    const isLastItemOnPage = currentEntries.length === 1;
     const isNotFirstPage = activePage > 1;
 
-    setClients((prev) =>
-      prev.filter((client) => client.id !== deleteTarget.id)
+    setTimesheetEntries((prev) =>
+      prev.filter((entry) => entry.id !== deleteTarget.id)
     );
 
-    // If we deleted the last item on the page and we're not on the first page, go back a page
     if (isLastItemOnPage && isNotFirstPage) {
       setActivePage(prev => prev - 1);
     }
 
     setDeleteTarget(null);
   };
-  
- 
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Loading timesheet data...</p>
+      </div>
+    );
+  }
 
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-red-500">Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex">
@@ -207,153 +154,138 @@ const currentClients = filteredClients.slice(startIndex, endIndex);
       </aside>
 
       <main className="w-full md:w-[67%] lg:w-[73%] xl:w-[80%] 2xl:w-[82%] lg:ml-28 border-[1px] rounded-lg px-6 py-8 md:px- lg:px- xl:mx-aut mt-[100px] md:ml-26 lg:ml-26 xl:ml-12 2xl:ml-6">
-        {!selectedClient ? (
-          <>
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-              <div className="relative w-full sm:w-1/2 mb-4">
-                <div className="bg-white  border-gray-200 p-4 rounded-xl">
-                  <div className="relative mb-4">
-                    <FaSearch className="absolute top-4 left-3 text-gray-400 text-sm md:text-sm" />
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 text-sm md:text-lg"
-                      value={searchTerm}
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value.toLowerCase());
-                        setActivePage(1); // har new search pe page 1 pe chala jaye
-                      }}
-                    />
-
-                  </div>
+        <>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+            <div className="relative w-full sm:w-1/2 mb-4">
+              <div className="bg-white border-gray-200 p-4 rounded-xl">
+                <div className="relative mb-4">
+                  <FaSearch className="absolute top-4 left-3 text-gray-400 text-sm md:text-sm" />
+                  <input
+                    type="text"
+                    placeholder="Search"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 text-sm md:text-lg"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value.toLowerCase());
+                      setActivePage(1);
+                    }}
+                  />
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  resetForm();
-                  setShowAddModal(true);
-                }}
-                className="bg-[#192232] text-white px-4 py-2 rounded-lg hover:bg-[#192443] transition"
-              >
-                Add TimeSheet
-              </button>
             </div>
+            <button
+              onClick={() => {
+                resetForm();
+                setShowAddModal(true);
+              }}
+              className="bg-[#192232] text-white px-4 py-2 rounded-lg hover:bg-[#192443] transition"
+            >
+              Add Time 
+            </button>
+          </div>
+
+          {showAddModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center shadow-2xl">
+              <div className="bg-white p-6 rounded-lg shadow-2xl w-[90%] md:w-[500px]">
+                <h2 className="text-lg font-semibold mb-4">Add New Time Entry</h2>
+                <form onSubmit={handleAddEntry} className="space-y-4">
+        <select
+  className="border p-2 rounded w-full"
+  value={name}
+  onChange={(e) => setName(e.target.value)}
+  required
+>
+  <option value="">Employees ID</option>
+  {employees.map((emp) => (
+    <option key={emp._id} value={`${emp.firstName} ${emp.lastName}`}>
+      {emp.firstName} {emp.lastName}
+    </option>
+  ))}
+</select>
 
 
-            {showAddModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center shadow-2xl">
-                <div className="bg-white p-6 rounded-lg shadow-2xl w-[90%] md:w-[500px]">
-                  <h2 className="text-lg font-semibold mb-4">Add New Client</h2>
-                  <form onSubmit={handleAddClient} className="space-y-4">
-                    <input
-                      type="text"
-                      placeholder="Client Name"
-                      className="border p-2 rounded w-full"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Designation"
-                      className="border p-2 rounded w-full"
-                      value={designation}
-                      onChange={(e) => setDesignation(e.target.value)}
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Type"
-                      className="border p-2 rounded w-full"
-                      value={type}
-                      onChange={(e) => setType(e.target.value)}
-                      required
-                    />
-                    <input
-                      type="text"
-                      placeholder="Check"
-                      className="border p-2 rounded w-full"
-                      value={check}
-                      onChange={(e) => setCheck(e.target.value)}
-                      required
-                    />
-                    <select
-                      className="border p-2 rounded w-full"
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                    >
-                      <option>On Time</option>
-                      <option>Off Time</option>
-                    </select>
-                    <div className="flex justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          resetForm();
-                          setShowAddModal(false);
-                        }}
-                        className="px-4 py-2 border rounded hover:bg-gray-100"
-                      >
-                        Cancel
-                      </button>
-                      <button
-                        type="submit"
-                        className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#192443]"
-                      >
-                        Save Client
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            )}
-
-            {deleteTarget && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center shadow-2xl">
-                <div className="bg-white p-6 rounded-lg shadow-2xl w-[90%] md:w-[400px] text-center">
-                  <h2 className="text-lg font-semibold mb-4">Delete Client</h2>
-                  <p className="mb-6">
-                    Are you sure you want to delete{" "}
-                    <strong>{deleteTarget.name}</strong> profile?
-                  </p>
-                  <div className="flex justify-center gap-4">
+                  <input
+                    type="time"
+                    placeholder="Check-in Time"
+                    className="border p-2 rounded w-full"
+                    value={checkInTime}
+                    onChange={(e) => setCheckInTime(e.target.value)}
+                    required
+                  />
+                  <select
+                    className="border p-2 rounded w-full"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                  >
+                    <option>On Time</option>
+                    <option>Off Time</option>
+                  </select>
+                  <div className="flex justify-end gap-2">
                     <button
-                      onClick={() => setDeleteTarget(null)}
+                      type="button"
+                      onClick={() => {
+                        resetForm();
+                        setShowAddModal(false);
+                      }}
                       className="px-4 py-2 border rounded hover:bg-gray-100"
                     >
                       Cancel
                     </button>
                     <button
-                      onClick={handleDeleteClient}
-                      className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                      type="submit"
+                      className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#192443]"
                     >
-                      Confirm Delete
+                      Save Entry
                     </button>
                   </div>
+                </form>
+              </div>
+            </div>
+          )}
+
+          {deleteTarget && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center shadow-2xl">
+              <div className="bg-white p-6 rounded-lg shadow-2xl w-[90%] md:w-[400px] text-center">
+                <h2 className="text-lg font-semibold mb-4">Delete Time Entry</h2>
+                <p className="mb-6">
+                  Are you sure you want to delete the time entry for{" "}
+                  <strong>{deleteTarget.name}</strong>?
+                </p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => setDeleteTarget(null)}
+                    className="px-4 py-2 border rounded hover:bg-gray-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDeleteEntry}
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                  >
+                    Confirm Delete
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
+          )}
 
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left text-sm">
-                <thead className="bg-gray-10">
-                  <tr>
-                    <th className="p-3 border-b">Sr. No.</th>
-                    <th className="p-3 border-b">Employee Name</th>
-                    <th className="p-3 border-b">Designation</th>
-                    <th className="p-3 border-b">Type</th>
-                    <th className="p-3 border-b">CheckIn Time</th>
-                    <th className="p-3 border-b">Status</th>
-                    <th className="p-3 border-b">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentClients.map((client, index) => (
-                    <tr key={client.id} className="hover:bg-gray-50 transition">
-                      <td className="p-3 border-b">   {
-    clients.findIndex(c => c.id === client.id) + 1
-  }  </td>
-                      {editingId === client.id ? (
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse text-left text-sm">
+              <thead className="bg-gray-10">
+                <tr>
+                  <th className="p-3 border-b">Sr. No.</th>
+                  <th className="p-3 border-b">Employee Name</th>
+                  <th className="p-3 border-b">CheckIn Time</th>
+                  <th className="p-3 border-b">Status</th>
+                  <th className="p-3 border-b">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentEntries.length > 0 ? (
+                  currentEntries.map((entry, index) => (
+                    <tr key={entry.id} className="hover:bg-gray-50 transition">
+                      <td className="p-3 border-b">{startIndex + index + 1}</td>
+                      {editingId === entry.id ? (
                         <>
                           <td className="p-3 border-b">
                             <input
@@ -365,26 +297,10 @@ const currentClients = filteredClients.slice(startIndex, endIndex);
                           </td>
                           <td className="p-3 border-b">
                             <input
-                              type="text"
-                              className="border p-1 rounded w-full"
-                              value={designation}
-                              onChange={(e) => setDesignation(e.target.value)}
-                            />
-                          </td>
-                          <td className="p-3 border-b">
-                            <input
-                              type="text"
-                              className="border p-1 rounded w-full"
-                              value={type}
-                              onChange={(e) => setType(e.target.value)}
-                            />
-                          </td>
-                          <td className="p-3 border-b">
-                            <input
                               type="time"
                               className="border p-1 rounded w-full"
-                              value={check}
-                              onChange={(e) => setCheck(e.target.value)}
+                              value={checkInTime}
+                              onChange={(e) => setCheckInTime(e.target.value)}
                             />
                           </td>
                           <td className="p-3 border-b">
@@ -402,36 +318,30 @@ const currentClients = filteredClients.slice(startIndex, endIndex);
                               onClick={handleEditSubmit}
                               className="bg-[#192443] text-white px-3 py-2 rounded hover:bg-[#0f1a31] flex items-center gap-1"
                             >
-                              <Check size={16} />
+                              Save
                             </button>
                           </td>
                         </>
                       ) : (
                         <>
-                          <td className="p-3 border-b">{client.name}</td>
-                          <td className="p-3 border-b">{client.designation}</td>
-                          <td className="p-3 border-b">{client.type}</td>
-                          <td className="p-3 border-b">{client.check}</td>
+                          <td className="p-3 border-b">{entry.name}</td>
+                          <td className="p-3 border-b">{entry.checkInTime || "N/A"}</td>
                           <td className="p-3 border-b">
                             <span
-                              className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${client.status === "On Time"
+                              className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                                entry.status === "On Time"
                                   ? "bg-blue-100 text-blue-600"
                                   : "bg-yellow-100 text-yellow-600"
-                                }`}
+                              }`}
                             >
-                              {client.status}
+                              {entry.status || "N/A"}
                             </span>
                           </td>
                           <td className="p-3 border-b">
                             <div className="flex items-center gap-2">
+                              
                               <button
-                                onClick={() => handleEditClient(client)}
-                                className="text-[#192232] hover:text-[#192443]"
-                              >
-                                <RiPencilFill />
-                              </button>
-                              <button
-                                onClick={() => setDeleteTarget(client)}
+                                onClick={() => setDeleteTarget(entry)}
                                 className="text-red-600 hover:text-red-800"
                               >
                                 <FaRegTrashAlt />
@@ -441,64 +351,58 @@ const currentClients = filteredClients.slice(startIndex, endIndex);
                         </>
                       )}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
-              {/* <div className="flex items-center gap-2">
-                <p className="text-sm md:text-md">Showing</p>
-                <select className="w-16 p-1 text-sm md:text-md outline-0 border border-gray-300 rounded-md bg-[#ebebeb]">
-                  {[10, 9, 8, 7].map((num) => (
-                    <option key={num}>{num}</option>
-                  ))}
-                </select>
-              </div> */}
-
-              <p className="text-sm md:text-md">
-                Showing {startIndex + 1} to {Math.min(endIndex, clients.length)} of {clients.length} records
-              </p>
-
-              <div className="flex items-center gap-2 text-sm md:text-sm">
-                <FaChevronLeft
-                  className={`cursor-pointer ${activePage === 1 ? "opacity-50" : ""}`}
-                  onClick={() => {
-                    if (activePage > 1) setActivePage(prev => prev - 1);
-                  }}
-                />
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-                  <button
-                    key={num}
-                    onClick={() => setActivePage(num)}
-                    className={`px-3 py-1 rounded-sm ${num === activePage
-                        ? "border border-[#7152F3] text-[#7152F3] font-bold"
-                        : "text-black"
-                      }`}
-                  >
-                    {num}
-                  </button>
-                ))}
-                <FaChevronRight
-                  className={`cursor-pointer ${activePage === totalPages ? "opacity-50" : ""}`}
-                  onClick={() => {
-                    if (activePage < totalPages) setActivePage(prev => prev + 1);
-                  }}
-                />
-              </div>
-            </div>
-          </>
-        ) : (
-          <div>
-            <button
-              onClick={() => setSelectedClient(null)}
-              className="mb-4 text-blue-600 underline"
-            >
-              ← Back to Clients
-            </button>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5" className="p-4 text-center">
+                      No time entries found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        )}
+
+          <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
+            <p className="text-sm md:text-md">
+              Showing {filteredEntries.length > 0 ? startIndex + 1 : 0} to{" "}
+              {Math.min(endIndex, filteredEntries.length)} of{" "}
+              {filteredEntries.length} records
+            </p>
+
+            <div className="flex items-center gap-2 text-sm md:text-sm">
+              <FaChevronLeft
+                className={`cursor-pointer ${activePage === 1 ? "opacity-50" : ""}`}
+                onClick={() => {
+                  if (activePage > 1) setActivePage(prev => prev - 1);
+                }}
+              />
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+                <button
+                  key={num}
+                  onClick={() => setActivePage(num)}
+                  className={`px-3 py-1 rounded-sm ${
+                    num === activePage
+                      ? "border border-[#7152F3] text-[#7152F3] font-bold"
+                      : "text-black"
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+              <FaChevronRight
+                className={`cursor-pointer ${activePage === totalPages ? "opacity-50" : ""}`}
+                onClick={() => {
+                  if (activePage < totalPages) setActivePage(prev => prev + 1);
+                }}
+              />
+            </div>
+          </div>
+        </>
       </main>
     </div>
   );
 }
+
+
+
