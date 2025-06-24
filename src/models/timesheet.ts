@@ -1,7 +1,7 @@
-import { Schema, model, models, Document } from 'mongoose';
+import { Schema, model, models, Document, Types } from 'mongoose';
 
 export interface ITimesheet extends Document {
-  employeeName: string;
+  employeeId: Types.ObjectId;
   designation: string;
   checktime: Date;
   status: 'checked-in' | 'checked-out' | 'on-break';
@@ -12,25 +12,19 @@ export interface ITimesheet extends Document {
 
 const TimesheetSchema = new Schema<ITimesheet>(
   {
-    employeeName: {
-      type: String,
+    employeeId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Employee',
       required: true,
-      trim: true
-    },
-    designation: {
-      type: String,
-      required: true,
-      trim: true
     },
     checktime: {
       type: Date,
+      default: Date.now,
       required: true,
-      default: Date.now
     },
     status: {
       type: String,
       required: true,
-      enum: ['checked-in', 'checked-out', 'on-break'],
       default: 'checked-in'
     },
     duration: {
@@ -44,3 +38,7 @@ const TimesheetSchema = new Schema<ITimesheet>(
 );
 
 export const Timesheet = models.Timesheet || model<ITimesheet>('Timesheet', TimesheetSchema);
+
+
+
+

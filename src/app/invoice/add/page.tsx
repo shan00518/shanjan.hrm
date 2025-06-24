@@ -1,15 +1,12 @@
 
 
-
-
-
-
-
 'use client';
 
 import Image from "next/image";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from "react-toastify";
+
 
 type InvoiceItem = {
   project: string;
@@ -138,12 +135,13 @@ export default function Invoice() {
 
   const handleSaveInvoice = async () => {
     if (!invoiceNumber.trim() || !billTo.trim()) {
-      alert("Please fill in required fields: Invoice Number and Bill To");
+    toast.error("Please fill in required fields: Invoice Number and Bill To");
       return;
     }
 
     if (items.some(item => !item.project.trim() || item.quantity < 1)) {
-      alert("Each item must have a valid project and quantity.");
+        toast.warning("Each item must have a valid project and quantity.");
+
       return;
     }
 
@@ -182,13 +180,14 @@ export default function Invoice() {
         throw new Error(data.message || 'Invoice save failed');
       }
 
-   alert("Invoice saved successfully!");
+
+    toast.success("Invoice saved successfully!");
 console.log("Redirecting to /invoice...");
 router.push("/invoice");
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      alert("Error saving invoice: " + error.message);
+    toast.error("Error saving invoice: " + error.message);
     }
   };
 
@@ -422,3 +421,7 @@ router.push("/invoice");
     </div>
   );
 }
+
+
+
+

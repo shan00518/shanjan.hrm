@@ -1,7 +1,8 @@
+
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
+// import { Check } from "lucide-react";
 import { RiPencilFill } from "react-icons/ri";
 import { FaRegTrashAlt, FaSearch } from "react-icons/fa";
 
@@ -164,7 +165,6 @@ export default function Reports() {
                 <select
                   className="border p-2 rounded w-full"
                   value={status}
-                  onChange={(e) => setStatus(e.target.value)}
                 >
                   <option>On</option>
                   <option>Off</option>

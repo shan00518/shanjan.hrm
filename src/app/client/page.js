@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { toast } from "react-toastify";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ClientsPage() {
@@ -35,8 +37,10 @@ export default function ClientsPage() {
         const data = await res.json();
         console.log('fetching clients', data);
         setClients(data.clients);
+        toast.success('Clients loaded successfully');
       } catch (error) {
         console.error('An error occurred during fetching clients:', error)
+        toast.error(error.message || 'failed to load clients');
       }
     }
     fetchClients();
@@ -76,9 +80,11 @@ export default function ClientsPage() {
       setClients((prev) => [...prev, data.client]);
       resetForm();
       setShowAddModal(false);
+     toast.success("Client added successfully!");
+
     } catch (error) {
       console.error("Error creating client:", error);
-      alert("Failed to create client. Please check console for details.");
+      toast.error("Failed to create client.");
     } finally {
       setAddLoading(false);
     }
@@ -87,6 +93,8 @@ export default function ClientsPage() {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setEditLoading(true);
+    toast.info('Updating client...');
+
     try {
       const formData = new FormData();
       formData.append("name", editClientData.clientName);
@@ -123,9 +131,12 @@ export default function ClientsPage() {
         avatar: null,
         avatarPreview: "",
       });
+
+   toast.success("Client added successfully!");
+
     } catch (error) {
       console.error("Error updating client:", error);
-      alert("Failed to update client. Please check console for details.");
+      toast.error("Failed to update client. ");
     } finally {
       setEditLoading(false);
     }
@@ -161,9 +172,12 @@ export default function ClientsPage() {
       );
 
       setDeleteTarget(null);
+
+     toast.success("Client added successfully!");
+
     } catch (error) {
       console.error("Error deleting client:", error);
-      alert("Failed to delete client. Please check the console for details.");
+      toast.error("Failed to delete client.");
     }
   };
 
@@ -172,6 +186,8 @@ export default function ClientsPage() {
     if (file) {
       setAvatar(file);
       setAvatarPreview(URL.createObjectURL(file));
+      toast.success('Avatar selected');
+
     }
   };
 

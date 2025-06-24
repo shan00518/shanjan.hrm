@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { toast } from "react-toastify";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ProjectsPage() {
@@ -38,8 +40,12 @@ export default function ProjectsPage() {
         const data = await res.json();
         console.log("Projects fetched:", data.projects);
         setProjects(data.projects);
+        toast.success("Projects fetched successfully");
+
       } catch (error) {
         console.error('Error fetching projects:', error);
+          toast.error("Failed to fetch projects");
+
       }
     }
     fetchProjects();
@@ -58,7 +64,7 @@ export default function ProjectsPage() {
   const handleAddProject = async (e) => {
     e.preventDefault();
     setAddLoading(true);
-
+toast.info('Creating new project...');
 
     const payload ={
     
@@ -81,7 +87,7 @@ export default function ProjectsPage() {
 }
     // Basic validation
     if (!client || !name?.trim() || !startDate?.trim()) {
-      // alert("Please fill in all required fields: client, name, and start date.");
+      toast.error("Please fill in all required fields: client, name, and start date.");
       setAddLoading(false);
       return;
     }
@@ -113,18 +119,17 @@ export default function ProjectsPage() {
         throw new Error(data.message || "Failed to create project");
       }
 
-      // ✅ Show name and message from backend response
       alert(`${data.message}: ${data.project.name}`);
 
-      // ✅ Add to state
       setProjects((prev) => [...prev, data.project]);
 
-      // ✅ Reset form and modal
       resetForm();
       setShowAddModal(false);
+      toast.success(`Project "${data.project.name}" created successfully!`);
+
     } catch (error) {
       console.error("Error creating project:", error);
-      alert(error.message || "Failed to create project");
+  toast.error(error.message || "Failed to create project");
     } finally {
       setAddLoading(false);
     }
@@ -164,9 +169,11 @@ export default function ProjectsPage() {
         )
       );
       setShowEditModal(false);
+     toast.success(`Project updated: ${data.project.name}`);
+
     } catch (error) {
       console.error("Error updating project:", error);
-      alert(error.message || "Failed to update project");
+  toast.error(error.message || "Failed to update project");
     } finally {
       setEditLoading(false);
     }
@@ -203,9 +210,11 @@ export default function ProjectsPage() {
       console.log("Project deleted successfully");
       setProjects(prev => prev.filter(project => project._id !== deleteTarget._id));
       setDeleteTarget(null);
+            toast.success("Project deleted successfully");
+
     } catch (error) {
       console.error("Error deleting project:", error);
-      alert(error.message || "Failed to delete project");
+      toast.error(error.message || "Failed to delete project");
     }
   };
 

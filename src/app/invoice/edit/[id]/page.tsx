@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
+import { toast } from "react-toastify";
+
 
 interface LineItem {
   project: string;
@@ -109,14 +111,14 @@ export default function EditInvoicePage() {
       const result = await response.json();
 
       if (response.ok) {
-        alert("Invoice updated successfully!");
+      toast.success("Client updated successfully!");
         router.push("/invoice");
       } else {
         alert("Error updating invoice: " + (result.message || "Unknown error"));
       }
     } catch (error) {
       console.error(error);
-      alert("Something went wrong while updating.");
+      toast.error("Failed to update client");
     }
   };
 
