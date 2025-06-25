@@ -4,13 +4,12 @@ import { useEffect, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ProjectsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [client, setClient] = useState("");
-
+  const [clients, setClients] = useState([]); // State for clients list
   const [showEditModal, setShowEditModal] = useState(false);
   const [projects, setProjects] = useState([]);
   const [name, setName] = useState("");
@@ -33,22 +32,25 @@ export default function ProjectsPage() {
   });
 
   useEffect(() => {
-    const fetchProjects = async() => {
+    const fetchData = async () => {
       try {
-        console.log("Fetching projects...");
-        const res = await fetch('/api/project/list');
-        const data = await res.json();
-        console.log("Projects fetched:", data.projects);
-        setProjects(data.projects);
-        toast.success("Projects fetched successfully");
-
+        // Fetch projects
+        const projectsRes = await fetch('/api/project/list');
+        const projectsData = await projectsRes.json();
+        setProjects(projectsData.projects);
+        
+        // Fetch clients
+        const clientsRes = await fetch('/api/client/list');
+        const clientsData = await clientsRes.json();
+        setClients(clientsData.clients);
+        
+        toast.success("Data loaded successfully");
       } catch (error) {
-        console.error('Error fetching projects:', error);
-          toast.error("Failed to fetch projects");
-
+        console.error('Error fetching data:', error);
+        toast.error("Failed to load data");
       }
-    }
-    fetchProjects();
+    };
+    fetchData();
   }, []);
   
   const resetForm = () => {
@@ -64,27 +66,8 @@ export default function ProjectsPage() {
   const handleAddProject = async (e) => {
     e.preventDefault();
     setAddLoading(true);
-toast.info('Creating new project...');
+    toast.info('Creating new project...');
 
-    const payload ={
-    
-            "_id": "684dad91da064e32147a448e",
-            "client": "683dcd1f340e2ce0fdff2f5f",
-            "employees": [
-                "683dcd9b340e2ce0fdff2f62",
-                "683dcdb8340e2ce0fdff2f64"
-            ],
-            "name": "CRM Implementation",
-            "description": "Implement a CRM system for sales tracking.",
-            "price": 2000,
-            "startDate": "2025-06-01T00:00:00.000Z",
-            "endDate": "2025-07-15T00:00:00.000Z",
-            "status": "in_progress",
-            "createdAt": "2025-06-14T17:12:49.043Z",
-            "updatedAt": "2025-06-14T17:12:49.043Z",
-            "__v": 0
-        
-}
     // Basic validation
     if (!client || !name?.trim() || !startDate?.trim()) {
       toast.error("Please fill in all required fields: client, name, and start date.");
@@ -100,10 +83,7 @@ toast.info('Creating new project...');
         },
         body: JSON.stringify({
           client,
-          employees: [
-        "683dcd9b340e2ce0fdff2f62",
-        "683dcdb8340e2ce0fdff2f64"
-         ],
+          employees: [], // You can modify this to select employees if needed
           name,
           description,
           price: Number(price),
@@ -119,17 +99,13 @@ toast.info('Creating new project...');
         throw new Error(data.message || "Failed to create project");
       }
 
-      alert(`${data.message}: ${data.project.name}`);
-
       setProjects((prev) => [...prev, data.project]);
-
       resetForm();
       setShowAddModal(false);
       toast.success(`Project "${data.project.name}" created successfully!`);
-
     } catch (error) {
       console.error("Error creating project:", error);
-  toast.error(error.message || "Failed to create project");
+      toast.error(error.message || "Failed to create project");
     } finally {
       setAddLoading(false);
     }
@@ -138,7 +114,6 @@ toast.info('Creating new project...');
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setEditLoading(true);
-    console.log("Updating project:", editProjectData);
     
     try {
       const res = await fetch(`/api/project/update/${editProjectData.id}`, {
@@ -162,32 +137,29 @@ toast.info('Creating new project...');
         throw new Error(data.message || "Failed to update project");
       }
 
-      console.log("Project updated:", data);
       setProjects(prev => 
         prev.map(project => 
           project._id === editProjectData.id ? data.project : project
         )
       );
       setShowEditModal(false);
-     toast.success(`Project updated: ${data.project.name}`);
-
+      toast.success(`Project updated: ${data.project.name}`);
     } catch (error) {
       console.error("Error updating project:", error);
-  toast.error(error.message || "Failed to update project");
+      toast.error(error.message || "Failed to update project");
     } finally {
       setEditLoading(false);
     }
   };
 
   const openEditModal = (project) => {
-    console.log("Editing project:", project);
     setEditProjectData({
       id: project._id,
       name: project.name,
       description: project.description,
       price: project.price.toString(),
       startDate: project.startDate.split('T')[0],
-      endDate: project.endDate.split('T')[0],
+      endDate: project.endDate ? project.endDate.split('T')[0] : '',
       status: project.status,
     });
     setShowEditModal(true);
@@ -195,7 +167,6 @@ toast.info('Creating new project...');
 
   const handleDeleteProject = async () => {
     if (!deleteTarget) return;
-    console.log("Deleting project:", deleteTarget._id);
     
     try {
       const res = await fetch(`/api/project/delete/${deleteTarget._id}`, {
@@ -207,11 +178,9 @@ toast.info('Creating new project...');
         throw new Error(errorData.message || "Failed to delete project");
       }
 
-      console.log("Project deleted successfully");
       setProjects(prev => prev.filter(project => project._id !== deleteTarget._id));
       setDeleteTarget(null);
-            toast.success("Project deleted successfully");
-
+      toast.success("Project deleted successfully");
     } catch (error) {
       console.error("Error deleting project:", error);
       toast.error(error.message || "Failed to delete project");
@@ -266,14 +235,20 @@ toast.info('Creating new project...');
             <div className="bg-white p-6 rounded-lg shadow-2xl w-[90%] md:w-[500px]">
               <h2 className="text-lg font-semibold mb-4">Add New Project</h2>
               <form onSubmit={handleAddProject} className="space-y-2">
-                <input
-                  type="text"
-                  placeholder="Client"
+                <select
                   className="border p-2 rounded w-full"
                   value={client}
                   onChange={(e) => setClient(e.target.value)}
                   required
-                />
+                >
+                  <option value="">Select Client</option>
+                  {clients.map((client) => (
+                    <option key={client._id} value={client._id}>
+                      {client.name}
+                    </option>
+                  ))}
+                </select>
+
                 <input
                   type="text"
                   placeholder="Project Name"
@@ -311,7 +286,6 @@ toast.info('Creating new project...');
                   className="border p-2 rounded w-full"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  required
                 />
                 <select
                   className="border p-2 rounded w-full"
@@ -401,7 +375,6 @@ toast.info('Creating new project...');
                   onChange={(e) =>
                     setEditProjectData({ ...editProjectData, endDate: e.target.value })
                   }
-                  required
                 />
                 <select
                   className="border p-2 rounded w-full"
@@ -471,6 +444,7 @@ toast.info('Creating new project...');
               <tr>
                 <th className="p-3 border-b">#</th>
                 <th className="p-3 border-b">Project Name</th>
+                <th className="p-3 border-b">Client</th>
                 <th className="p-3 border-b">Description</th>
                 <th className="p-3 border-b">Price</th>
                 <th className="p-3 border-b">Start Date</th>
@@ -480,35 +454,41 @@ toast.info('Creating new project...');
               </tr>
             </thead>
             <tbody>
-              {projects.map((project, index) => (
-                <tr key={project._id} className="hover:bg-gray-50 transition">
-                  <td className="p-3 border-b">{index + 1}</td>
-                  <td className="p-3 border-b">{project.name}</td>
-                  <td className="p-3 border-b">{project.description}</td>
-                  <td className="p-3 border-b">${project.price}</td>
-                  <td className="p-3 border-b">{formatDate(project.startDate)}</td>
-                  <td className="p-3 border-b">{formatDate(project.endDate)}</td>
-                  <td className="p-3 border-b">
-                    {getStatusBadge(project.status)}
-                  </td>
-                  <td className="p-3 border-b">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => openEditModal(project)}
-                        className="text-[#192232] hover:text-[#192443]"
-                      >
-                        <MdEdit />
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(project)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <FaRegTrashAlt />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {projects.map((project, index) => {
+                const projectClient = clients.find(c => c._id === project.client);
+                return (
+                  <tr key={project._id} className="hover:bg-gray-50 transition">
+                    <td className="p-3 border-b">{index + 1}</td>
+                    <td className="p-3 border-b">{project.name}</td>
+                    <td className="p-3 border-b">
+                      {projectClient ? projectClient.name : 'N/A'}
+                    </td>
+                    <td className="p-3 border-b">{project.description}</td>
+                    <td className="p-3 border-b">${project.price}</td>
+                    <td className="p-3 border-b">{formatDate(project.startDate)}</td>
+                    <td className="p-3 border-b">{formatDate(project.endDate)}</td>
+                    <td className="p-3 border-b">
+                      {getStatusBadge(project.status)}
+                    </td>
+                    <td className="p-3 border-b">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEditModal(project)}
+                          className="text-[#192232] hover:text-[#192443]"
+                        >
+                          <MdEdit />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(project)}
+                          className="text-red-600 hover:text-red-800"
+                        >
+                          <FaRegTrashAlt />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

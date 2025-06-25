@@ -24,7 +24,7 @@ const Sidebar = () => {
     { href: "/employees", label: "Employees", icon: FaLaptop },
     { href: "/invoice", label: "Invoice", icon: FaFileInvoiceDollar },
     { href: "/timesheet", label: "Timesheet", icon: IoMdTime },
-    { href: "/reports", label: "Reports", icon: ImStatsDots },
+    // { href: "/reports", label: "Reports", icon: ImStatsDots },
     { href: "/setting", label: "Settings", icon: IoSettingsOutline },
   ];
 
