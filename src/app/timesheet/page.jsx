@@ -224,6 +224,7 @@ export default function Timesheet() {
                       setActivePage(1);
                     }}
                   />
+                 
                 </div>
               </div>
             </div>
@@ -250,9 +251,9 @@ export default function Timesheet() {
               resetForm();
               setShowAddModal(true);
             }}
-            className="bg-[#192232] text-white px-4 py-2 rounded-lg hover:bg-[#192443] transition"
+            className="bg-[#192232] text-white px-4 py-3 mb-8 rounded-lg hover:bg-[#192443] transition"
           >
-            Add Timesheet
+            AddTime
           </button>
         </div>
 
