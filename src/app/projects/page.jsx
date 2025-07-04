@@ -152,18 +152,19 @@ export default function ProjectsPage() {
     }
   };
 
-  const openEditModal = (project) => {
-    setEditProjectData({
-      id: project._id,
-      name: project.name,
-      description: project.description,
-      price: project.price.toString(),
-      startDate: project.startDate.split('T')[0],
-      endDate: project.endDate ? project.endDate.split('T')[0] : '',
-      status: project.status,
-    });
-    setShowEditModal(true);
-  };
+ const openEditModal = (project) => {
+  setEditProjectData({
+    id: project._id,
+    client: project.client, 
+    name: project.name,
+    description: project.description,
+    price: project.price.toString(),
+    startDate: project.startDate.split('T')[0],
+    endDate: project.endDate ? project.endDate.split('T')[0] : '',
+    status: project.status,
+  });
+  setShowEditModal(true);
+};
 
   const handleDeleteProject = async () => {
     if (!deleteTarget) return;
@@ -328,6 +329,21 @@ export default function ProjectsPage() {
             <div className="bg-white p-6 rounded-lg shadow-2xl w-[90%] md:w-[500px]">
               <h2 className="text-lg font-semibold mb-4">Edit Project</h2>
               <form onSubmit={handleEditSubmit} className="space-y-2">
+                    <select
+          className="border p-2 rounded w-full"
+          value={editProjectData.client}
+          onChange={(e) =>
+            setEditProjectData({ ...editProjectData, client: e.target.value })
+          }
+          required
+        >
+          <option value="">Select Client</option>
+          {clients.map((client) => (
+            <option key={client._id} value={client._id}>
+              {client.name}
+            </option>
+          ))}
+        </select>
                 <input
                   type="text"
                   placeholder="Project Name"

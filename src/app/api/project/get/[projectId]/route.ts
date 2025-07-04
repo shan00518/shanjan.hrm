@@ -13,8 +13,8 @@ export async function GET(
     try {
         const { projectId } = await params;
         const project = await Project.findById(projectId)
-            // .populate('client', 'name email phone location')
-            // .populate('employees', 'firstName lastName email');
+            .populate('client', 'name')
+            // .populate('employees', 'firstName lastName');
         if (!project) return notFound('Project not found');
 
         return success({ project });

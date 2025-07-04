@@ -141,7 +141,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Card 2 - Active Projects */}
           <div className="bg-white border border-gray-200 rounded-lg shadow p-4">
             <div className="text-gray-700 text-xl sm:text-sm mb-2">Active Projects</div>
             <div className="flex items-center">
@@ -150,7 +149,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Card 3 - Total Invoices */}
           <div className="bg-white border border-gray-200 rounded-lg shadow p-4">
             <div className="text-gray-700 text-xl sm:text-sm mb-2">Total Invoices</div>
             <div className="flex items-center">
@@ -159,9 +157,9 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Card 4 - Developers */}
+          
           <div className="bg-white border border-gray-200 rounded-lg shadow p-4">
-            <div className="text-gray-700 text-xl sm:text-sm mb-2">Developers</div>
+            <div className="text-gray-700 text-xl sm:text-sm mb-2">Employees</div>
             <div className="flex items-center">
               <h1 className="text-md sm:text-2xl">{employees.length}</h1>
               <p className="text-gray-500 ml-2 text-sm">+8%</p>
@@ -169,13 +167,11 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Bottom Section */}
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Clients List */}
           <div className="bg-white border border-gray-200 rounded-lg shadow p-4">
             <div className="flex justify-between items-center mb-4">
               <div className="text-gray-700 text-sm">Recent Clients</div>
-              <button className="text-blue-600 text-sm">View All</button>
+              {/* <button className="text-blue-600 text-sm">View All</button> */}
             </div>
             <div className="space-y-4">
               {clients.length > 0 ? (
@@ -201,11 +197,10 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Projects List */}
           <div className="bg-white border border-gray-200 rounded-lg shadow p-4">
             <div className="flex justify-between items-center mb-4">
               <div className="text-gray-700 text-sm">Recent Projects</div>
-              <button className="text-blue-600 text-sm">View All</button>
+              {/* <button className="text-blue-600 text-sm">View All</button> */}
             </div>
             <div className="space-y-4">
               {projects.length > 0 ? (

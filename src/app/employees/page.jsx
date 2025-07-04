@@ -88,19 +88,16 @@ const id ="685868f8ec837daef4c5a049"
 const handleUpdate = async (e) => {
   e.preventDefault();
   try {
-    // Create FormData object
     const formData = new FormData();
     
-    // Append all fields that your backend expects
     formData.append('firstName', currentEmployee.firstName);
     formData.append('lastName', currentEmployee.lastName);
-    formData.append('employeeId', currentEmployee.employeeId);
+    formData.append('employeeCode', currentEmployee.employeeCode);
     formData.append('department', currentEmployee.department);
     formData.append('designation', currentEmployee.designation);
     formData.append('isActive', currentEmployee.isActive);
     
-    // Note: Don't set Content-Type header - the browser will set it automatically
-    // with the correct boundary for FormData
+    
     const res = await fetch(`/api/employee/update/${id}`, {
       method: "PUT",
       body: formData
@@ -221,7 +218,7 @@ console.log("currentEmployee", currentEmployee)
               <thead>
                 <tr className="text-black border-b border-black text-sm font-semibold">
                   <th className="p-3">Employee Name</th>
-                  <th className="p-3">Employee ID</th>
+                  <th className="p-3">employeeCode</th>
                   <th className="p-3 hidden sm:table-cell">Department</th>
                   <th className="p-3 hidden md:table-cell">Designation</th>
                   <th className="p-3">Status</th>
@@ -236,7 +233,7 @@ console.log("currentEmployee", currentEmployee)
                     className="border-b border-gray-200 text-sm hover:bg-gray-50"
                   >
                     <td className="p-3">{emp.firstName} {emp.lastName}</td>
-                    <td className="p-3">{emp.employeeId}</td>
+                    <td className="p-3">{emp.employeeCode}</td>
                     <td className="p-3 hidden sm:table-cell">
                       {emp.department}
                     </td>
@@ -319,8 +316,8 @@ console.log("currentEmployee", currentEmployee)
           </label>
           <input
             type="text"
-            name="employeeId"
-            value={currentEmployee.employeeId || ''}
+            name="employeeCode"
+            value={currentEmployee.employeeCode || ''}
             onChange={handleInputChange}
             className="w-full border px-3 py-2 rounded"
           />

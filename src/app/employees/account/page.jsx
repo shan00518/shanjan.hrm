@@ -26,7 +26,7 @@ export default function Account() {
       form.append("lastName", formData.lastName);
       form.append("email", formData.email);
       form.append("mobile", formData.mobile);
-      form.append("employeeId", formData.employeeId);
+      form.append("employeeCode", formData.employeeCode);
       form.append("username", formData.username);
       form.append("dateOfJoining", formData.dateOfJoining);
       form.append("employeeType", formData.employeeType);

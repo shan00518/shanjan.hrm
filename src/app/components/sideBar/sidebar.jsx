@@ -9,6 +9,8 @@ import { ImStatsDots } from "react-icons/im";
 import { RiDashboard3Line } from "react-icons/ri";
 import { IoSettingsOutline, IoPeopleSharp } from "react-icons/io5";
 import { GoProjectSymlink } from "react-icons/go";
+import { ImUserTie } from "react-icons/im";
+
 
 const Sidebar = () => {
   const [isOpen, setIsopen] = useState(false);
@@ -21,7 +23,7 @@ const Sidebar = () => {
    { href: "/projects", label: "Project", icon: GoProjectSymlink
  },
 
-    { href: "/employees", label: "Employees", icon: FaLaptop },
+    { href: "/employees", label: "Employees", icon: ImUserTie  },
     { href: "/invoice", label: "Invoice", icon: FaFileInvoiceDollar },
     { href: "/timesheet", label: "Timesheet", icon: IoMdTime },
     // { href: "/reports", label: "Reports", icon: ImStatsDots },

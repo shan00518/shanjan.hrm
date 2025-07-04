@@ -8,11 +8,11 @@ import { NextRequest } from 'next/server';
 
 export async function GET(
     _: NextRequest,
-    { params }: { params: Promise<{ employeeId: string }> }
+    { params }: { params: Promise<{ employeeCode: string }> }
 ) {
     await connectDB();
-    const { employeeId } = await params;
-    const emp = await Employee.findById(employeeId);
+    const {employeeCode } = await params;
+    const emp = await Employee.findById(employeeCode);
     if (!emp) return notFound('Employee not found');
     return success({ employee: emp });
 }

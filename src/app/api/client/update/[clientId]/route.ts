@@ -21,6 +21,9 @@ export async function PUT(
         const email = formData.get('email')?.toString()?.toLowerCase();
         const phone = formData.get('phone')?.toString();
         const location = formData.get('location')?.toString();
+        const status = formData.get('status')?.toString() as 'active' | 'inactive' | undefined;
+
+        
         const avatarFile = formData.get('avatar') as Blob | null;
 
         const updates: Record<string, unknown> = {};
@@ -29,6 +32,7 @@ export async function PUT(
         if (email) updates.email = email;
         if (phone) updates.phone = phone;
         if (location) updates.location = location;
+        if (status) updates.status = status;
 
         const { clientId } = await params;
         const client = await Client.findById(clientId);

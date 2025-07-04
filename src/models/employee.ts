@@ -22,7 +22,7 @@ export interface IEmployee extends Document {
     city?: string;
     state?: string;
     zipCode?: string;
-    employeeId?: string;
+    employeeCode?: string;
     username?: string;
     employeeType?: typeof EmployeeTypeEnum[number];
     department?: string;
@@ -62,7 +62,7 @@ const EmployeeSchema = new Schema<IEmployee>(
         city: { type: String, trim: true },
         state: { type: String, trim: true },
         zipCode: { type: String, trim: true },
-        employeeId: { type: String, trim: true },
+        employeeCode: { type: String, trim: true },
         username: { type: String, trim: true },
         employeeType: { type: String, enum: EmployeeTypeEnum },
         department: { type: String, trim: true },

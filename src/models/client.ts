@@ -5,9 +5,10 @@ export interface IClient extends Document {
     email?: string;
     phone?: string;
     location?: string;
+    status ?: 'active' | 'inactive';
     avatar?: {
-        publicId: string;
-        url: string;
+    publicId: string;
+    url: string;
     };
     createdAt: Date;
     updatedAt: Date;
@@ -31,6 +32,10 @@ const ClientSchema = new Schema<IClient>(
             trim: true,
         },
         location: {
+            type: String,
+            trim: true,
+        },
+         status: {
             type: String,
             trim: true,
         },

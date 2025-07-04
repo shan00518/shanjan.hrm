@@ -14,6 +14,8 @@ export default function ClientsPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [status, setStatus] = useState("");
+
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [addLoading, setAddLoading] = useState(false);
@@ -62,6 +64,8 @@ export default function ClientsPage() {
       formData.append("name", name);
       formData.append("email", email);
       formData.append("phone", phone);
+      formData.append("status", status);
+
       if (avatar) {
         formData.append("avatar", avatar);
       }
@@ -100,6 +104,8 @@ export default function ClientsPage() {
       formData.append("name", editClientData.clientName);
       formData.append("email", editClientData.email);
       formData.append("phone", editClientData.phone);
+      formData.append("status", editClientData.status);
+
 
       if (editClientData.avatar && typeof editClientData.avatar !== "string") {
         formData.append("avatar", editClientData.avatar);
@@ -128,6 +134,7 @@ export default function ClientsPage() {
         clientName: "",
         email: "",
         phone: "",
+       status: "",
         avatar: null,
         avatarPreview: "",
       });
@@ -148,6 +155,8 @@ export default function ClientsPage() {
       clientName: client.name,
       email: client.email,
       phone: client.phone,
+      //  phone: client.status,
+
       avatar: client.avatar?.url || null,
       avatarPreview: client.avatar?.url || '',
     });
@@ -243,6 +252,18 @@ export default function ClientsPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+                <select
+  className="border p-2 rounded w-full"
+  value={editClientData.status}
+  onChange={(e) =>
+    setEditClientData({ ...editClientData, status: e.target.value })
+  }
+  required
+>
+  <option value="">Select Status</option>
+  <option value="active">Active</option>
+  <option value="inactive">Inactive</option>
+</select>
                 <input
                   type="tel"
                   placeholder="Client Phone"
@@ -323,6 +344,18 @@ export default function ClientsPage() {
                     setEditClientData({ ...editClientData, phone: e.target.value })
                   }
                 />
+                <select
+  className="border p-2 rounded w-full"
+  value={editClientData.status}
+  onChange={(e) =>
+    setEditClientData({ ...editClientData, status: e.target.value })
+  }
+  required
+>
+  <option value="">Select Status</option>
+  <option value="active">Active</option>
+  <option value="inactive">Inactive</option>
+</select>
                 <div className="flex items-center gap-4">
                   {(editClientData.avatarPreview || editClientData.avatar) && (
                     <Avatar className="h-12 w-12">
@@ -412,43 +445,49 @@ export default function ClientsPage() {
                 <th className="p-3 border-b">Client Name</th>
                 <th className="p-3 border-b">Email</th>
                 <th className="p-3 border-b">Phone</th>
+                 <th className="p-3 border-b">Status</th>
                 <th className="p-3 border-b">Action</th>
               </tr>
             </thead>
             <tbody>
-              {clients.map((client) => (
-                <tr key={client._id} className="hover:bg-gray-50 transition">
-                  <td className="p-3 border-b">{}</td>
-                  <td className="p-3 border-b">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={client.avatar?.url || "https://github.com/shadcn.png"} />
-                      <AvatarFallback>
-                        {client.name?.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                  </td>
-                  <td className="p-3 border-b">{client.name}</td>
-                  <td className="p-3 border-b">{client.email || 'N/A'}</td>
-                  <td className="p-3 border-b">{client.phone || 'N/A'}</td>
-                  <td className="p-3 border-b">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => openEditModal(client)}
-                        className="text-[#192232] hover:text-[#192443]"
-                      >
-                        <MdEdit />
-                      </button>
-                      <button
-                        onClick={() => setDeleteTarget(client)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <FaRegTrashAlt />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+  {clients.map((client) => (
+    <tr key={client._id} className="hover:bg-gray-50 transition">
+      <td className="p-3 border-b">{}</td>
+      <td className="p-3 border-b">
+        <Avatar className="h-8 w-8">
+          <AvatarImage src={client.avatar?.url || "https://github.com/shadcn.png"} />
+          <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
+        </Avatar>
+      </td>
+      <td className="p-3 border-b">{client.name}</td>
+      <td className="p-3 border-b">{client.email || 'N/A'}</td>
+      <td className="p-3 border-b">{client.phone || 'N/A'}</td>
+      <td className="p-3 border-b">
+        <span className={`px-2 py-1 rounded-full text-xs font-medium 
+          ${client.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {client.status || 'inactive'}
+        </span>
+      </td>
+      <td className="p-3 border-b">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => openEditModal(client)}
+            className="text-[#192232] hover:text-[#192443]"
+          >
+            <MdEdit />
+          </button>
+          <button
+            onClick={() => setDeleteTarget(client)}
+            className="text-red-600 hover:text-red-800"
+          >
+            <FaRegTrashAlt />
+          </button>
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
           </table>
         </div>
       </main>

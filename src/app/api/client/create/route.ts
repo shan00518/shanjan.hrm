@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
         email: form.get('email')?.toString()?.toLowerCase() || '',
         phone: form.get('phone')?.toString() || '',
         location: form.get('location')?.toString() || '',
+        status: form.get('status')?.toString() as 'active' | 'inactive' | undefined,
+
       };
   
       const avatarFile = form.get('avatar') as Blob | null;

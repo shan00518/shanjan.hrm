@@ -1,4 +1,4 @@
-// app/api/employee/[employeeId]/route.ts
+// app/api/employee/[employeeCode]/route.ts
 
 import { NextRequest } from 'next/server';
 import { connectDB } from '@/lib/database';
@@ -12,13 +12,13 @@ import { deleteFromCloudinary } from '@/lib/cloudinary';
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: Promise<{ employeeId: string }> }
+  { params }: { params: Promise<{ employeeCode: string }> }
 ) {
   await connectDB();
 
   try {
-    const { employeeId } = await params;
-    const emp = await Employee.findById(employeeId);
+    const { employeeCode } = await params;
+    const emp = await Employee.findById(employeeCode);
     if (!emp) return notFound('Employee not found');
 
     // Delete avatar if exists

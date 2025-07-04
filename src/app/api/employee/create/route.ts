@@ -17,8 +17,10 @@ export async function POST(req: NextRequest) {
         const firstName = form.get('firstName')?.toString();
         const lastName = form.get('lastName')?.toString();
         const email = form.get('email')?.toString()?.toLowerCase();
-        if (!firstName || !lastName || !email) {
-            return badRequest('firstName, lastName and email are required');
+        const employeeCode = form.get('employeeCode')?.toString();
+
+        if (!firstName || !lastName || !email || !employeeCode) {
+            return badRequest('firstName, lastName,employeeCode and email are required');
         }
 
         const payload: Partial<IEmployee> = {
@@ -26,6 +28,7 @@ export async function POST(req: NextRequest) {
             lastName,
             mobile: form.get('mobile')?.toString() || '',
             email,
+             employeeCode: employeeCode || '',
             dateOfBirth: form.get('dateOfBirth') ? new Date(form.get('dateOfBirth')!.toString()) : new Date(),
             dateOfJoining: form.get('dateOfJoining') ? new Date(form.get('dateOfJoining')!.toString()) : new Date(),
             maritalStatus: ['single', 'married'].includes(form.get('maritalStatus')?.toString() || '')
@@ -39,7 +42,6 @@ export async function POST(req: NextRequest) {
             city: form.get('city')?.toString() || '',
             state: form.get('state')?.toString() || '',
             zipCode: form.get('zipCode')?.toString() || '',
-            employeeId: form.get('employeeId')?.toString() || '',
             username: form.get('username')?.toString() || '',
             employeeType: ['educated', 'uneducated'].includes(form.get('employeeType')?.toString() || '')
                 ? (form.get('employeeType') as 'educated' | 'uneducated')
