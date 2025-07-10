@@ -1,7 +1,15 @@
+
+
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+
+const Spinner = () => (
+  <div className="flex justify-center items-center">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+  </div>
+);
 
 export default function Login() {
   const router = useRouter();
@@ -25,14 +33,16 @@ export default function Login() {
       });
       const data = await res.json();
       if (res.ok) {
-        setMessage(data.message || "✅ Login successful.");
+        setMessage(data.message || "Login successful.");
+        await new Promise((resolve) => setTimeout(resolve, 1200)); 
+
         router.push("/");
       } else {
-        setMessage(data.message || "❌ Login failed.");
+        setMessage(data.message || "Login failed.");
       }
     } catch (err) {
       console.error(err);
-      setMessage("❌ Something went wrong.");
+      setMessage("Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -43,20 +53,20 @@ export default function Login() {
       <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">Login</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input    
+          <input
             type="password"
             name="secretKey"
             placeholder="Enter Secret Key"
-            className="w-full p-3 border border-gray-300 rounded-lg "
+            className="w-full p-3 border border-gray-300 rounded-lg"
             onChange={handleChange}
             required
           />
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-[#182131] text-white font-semibold p-3 rounded-lg"
+            className="w-full bg-[#182131] text-white font-semibold p-3 rounded-lg flex justify-center items-center"
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? <Spinner /> : "Login"}
           </button>
           {message && (
             <p className="text-center text-sm text-gray-700 mt-2">{message}</p>

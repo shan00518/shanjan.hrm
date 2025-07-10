@@ -1,12 +1,14 @@
 
-
-
-
-
 'use client'
 // import Image from 'next/image'
 import { useEffect, useState } from 'react'
 import { toast } from "react-toastify";
+
+const Spinner = () => (
+  <div className="flex justify-center items-center">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+  </div>
+);
 
 
 interface Project {
@@ -28,7 +30,6 @@ interface Invoice {
   _id: string
   total: number
   remainingAmount: number
-  // Add other invoice properties as needed
 }
 
 export default function Dashboard() {
@@ -56,7 +57,6 @@ export default function Dashboard() {
         toast.success('Projects loaded successfully')
 
 
-        // Fetch clients
         const clientRes = await fetch('/api/client/fetch')
         if (!clientRes.ok) throw new Error('Failed to fetch clients')
         const clientData = await clientRes.json()
@@ -64,7 +64,6 @@ export default function Dashboard() {
        toast.success('Clients loaded successfully')
 
 
-        // Fetch employees
         const employeeRes = await fetch('/api/employee/fetch')
         if (!employeeRes.ok) throw new Error('Failed to fetch employees')
         const employeeData = await employeeRes.json()
@@ -72,7 +71,6 @@ export default function Dashboard() {
        toast.success('Employees loaded successfully')
 
 
-        // Fetch invoices
         const invoiceRes = await fetch('/api/invoice/list')
         if (!invoiceRes.ok) throw new Error('Failed to fetch invoices')
         const invoiceData = await invoiceRes.json()
@@ -80,7 +78,6 @@ export default function Dashboard() {
         toast.success('Invoices loaded successfully')
 
         
-        // Calculate total invoices amount
         const total = invoiceData.invoices.reduce((sum: number, invoice: Invoice) => sum + invoice.total, 0)
         setTotalInvoicesAmount(total)
 
@@ -96,24 +93,29 @@ export default function Dashboard() {
   }, [])
 
   if (loading) {
-    return (
-      <section className="relative w-full px-4 sm:px-6 mt-20 xl:pl-48 lg:pl-60 md:pl-56 overflow-y-hidden">
-        <div className="xl:w-[90%] lg:w-[95%] md:w-[80%] mx-auto">
-          <div className="animate-pulse space-y-6">
+  return (
+    <section className="relative w-full px-4 sm:px-6 mt-20 xl:pl-48 lg:pl-60 md:pl-56 overflow-y-hidden">
+      <div className="xl:w-[90%] lg:w-[95%] md:w-[80%] mx-auto">
+        <div className="space-y-6 text-center">
+          <Spinner />
+          <p className="text-gray-500 text-sm mt-2">Loading dashboard data...</p>
+          <div className="animate-pulse mt-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[1, 2, 3, 4].map((i) => (
                 <div key={i} className="bg-gray-200 h-24 rounded-lg"></div>
               ))}
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
               <div className="bg-gray-200 h-64 rounded-lg"></div>
               <div className="bg-gray-200 h-64 rounded-lg"></div>
             </div>
           </div>
         </div>
-      </section>
-    )
-  }
+      </div>
+    </section>
+  )
+}
+
 
   if (error) {
     return (
@@ -130,9 +132,7 @@ export default function Dashboard() {
   return (
     <section className="relative w-full px-4 sm:px-6 mt-20 xl:pl-48 lg:pl-60 md:pl-56 overflow-y-hidden">
       <div className="xl:w-[90%] lg:w-[95%] md:w-[80%] mx-auto">
-        {/* Top Cards Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
-          {/* Card 1 - Active Clients */}
           <div className="bg-white border border-gray-200 rounded-lg shadow p-4">
             <div className="text-gray-700 text-xl sm:text-sm mb-2">Active Clients</div>
             <div className="flex items-center">

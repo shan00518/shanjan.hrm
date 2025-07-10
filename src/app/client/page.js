@@ -1,9 +1,10 @@
+
 'use client'
 import { useEffect, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
-
+import { ClipLoader, ScaleLoader } from "react-spinners";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ClientsPage() {
@@ -15,6 +16,8 @@ export default function ClientsPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(true); // For initial data loading
+  const [deleting, setDeleting] = useState(false); // For delete operation
 
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
@@ -25,6 +28,7 @@ export default function ClientsPage() {
     clientName: '',
     email: '',
     phone: '',
+    status: '',
     avatar: null,
     avatarPreview: '',
   });
@@ -32,6 +36,7 @@ export default function ClientsPage() {
   useEffect(() => {
     const fetchClients = async() => {
       try {
+        setLoading(true);
         const res = await fetch('/api/client/list', {
           method: 'GET',
           headers: { "Content-Type": "application/json" },
@@ -40,9 +45,13 @@ export default function ClientsPage() {
         console.log('fetching clients', data);
         setClients(data.clients);
         toast.success('Clients loaded successfully');
+                await new Promise((resolve) => setTimeout(resolve, 1200)); 
+
       } catch (error) {
         console.error('An error occurred during fetching clients:', error)
         toast.error(error.message || 'failed to load clients');
+      } finally {
+        setLoading(false);
       }
     }
     fetchClients();
@@ -52,6 +61,7 @@ export default function ClientsPage() {
     setName("");
     setEmail("");
     setPhone("");
+    setStatus("");
     setAvatar(null);
     setAvatarPreview("");
   };
@@ -84,7 +94,7 @@ export default function ClientsPage() {
       setClients((prev) => [...prev, data.client]);
       resetForm();
       setShowAddModal(false);
-     toast.success("Client added successfully!");
+      toast.success("Client added successfully!");
 
     } catch (error) {
       console.error("Error creating client:", error);
@@ -105,7 +115,6 @@ export default function ClientsPage() {
       formData.append("email", editClientData.email);
       formData.append("phone", editClientData.phone);
       formData.append("status", editClientData.status);
-
 
       if (editClientData.avatar && typeof editClientData.avatar !== "string") {
         formData.append("avatar", editClientData.avatar);
@@ -134,16 +143,16 @@ export default function ClientsPage() {
         clientName: "",
         email: "",
         phone: "",
-       status: "",
+        status: "",
         avatar: null,
         avatarPreview: "",
       });
 
-   toast.success("Client added successfully!");
+      toast.success("Client updated successfully!");
 
     } catch (error) {
       console.error("Error updating client:", error);
-      toast.error("Failed to update client. ");
+      toast.error("Failed to update client.");
     } finally {
       setEditLoading(false);
     }
@@ -155,8 +164,7 @@ export default function ClientsPage() {
       clientName: client.name,
       email: client.email,
       phone: client.phone,
-      //  phone: client.status,
-
+      status: client.status || '',
       avatar: client.avatar?.url || null,
       avatarPreview: client.avatar?.url || '',
     });
@@ -167,6 +175,7 @@ export default function ClientsPage() {
     if (!deleteTarget) return;
 
     try {
+      setDeleting(true);
       const res = await fetch(`/api/client/delete/${deleteTarget._id}`, {
         method: "DELETE",
       });
@@ -181,12 +190,13 @@ export default function ClientsPage() {
       );
 
       setDeleteTarget(null);
-
-     toast.success("Client added successfully!");
+      toast.success("Client deleted successfully!");
 
     } catch (error) {
       console.error("Error deleting client:", error);
       toast.error("Failed to delete client.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -196,7 +206,6 @@ export default function ClientsPage() {
       setAvatar(file);
       setAvatarPreview(URL.createObjectURL(file));
       toast.success('Avatar selected');
-
     }
   };
 
@@ -213,7 +222,7 @@ export default function ClientsPage() {
 
   return (
     <div className="flex w-[] md:w-[100%]">
-      <aside className="w-[15%]  hidden md:block p-4">
+      <aside className="w-[15%] hidden md:block p-4">
         <p className="font-semibold">Sidebar</p>
       </aside>
 
@@ -225,9 +234,14 @@ export default function ClientsPage() {
               resetForm();
               setShowAddModal(true);
             }}
-            className="bg-[#192232] text-white px-4 py-1.5 rounded-lg hover:bg-[#192443] transition"
+            className="bg-[#192232] text-white px-4 py-1.5 rounded-lg hover:bg-[#192443] transition flex items-center gap-2"
+            disabled={loading}
           >
-            Add Clients
+            {loading ? (
+              <ClipLoader size={18} color="#ffffff" />
+            ) : (
+              'Add Clients'
+            )}
           </button>
         </div>
 
@@ -253,17 +267,15 @@ export default function ClientsPage() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
                 <select
-  className="border p-2 rounded w-full"
-  value={editClientData.status}
-  onChange={(e) =>
-    setEditClientData({ ...editClientData, status: e.target.value })
-  }
-  required
->
-  <option value="">Select Status</option>
-  <option value="active">Active</option>
-  <option value="inactive">Inactive</option>
-</select>
+                  className="border p-2 rounded w-full"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  required
+                >
+                  <option value="">Select Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
                 <input
                   type="tel"
                   placeholder="Client Phone"
@@ -294,15 +306,21 @@ export default function ClientsPage() {
                       setShowAddModal(false);
                     }}
                     className="px-4 py-2 border rounded hover:bg-gray-100"
+                    disabled={addLoading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={addLoading}
-                    className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#0f1a31]"
+                    className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#0f1a31] flex items-center justify-center gap-2 min-w-[80px]"
                   >
-                    {addLoading ? 'Saving...' : 'Save'}
+                    {addLoading ? (
+                      <>
+                        <ClipLoader size={18} color="#ffffff" />
+                        Saving...
+                      </>
+                    ) : 'Save'}
                   </button>
                 </div>
               </form>
@@ -345,17 +363,17 @@ export default function ClientsPage() {
                   }
                 />
                 <select
-  className="border p-2 rounded w-full"
-  value={editClientData.status}
-  onChange={(e) =>
-    setEditClientData({ ...editClientData, status: e.target.value })
-  }
-  required
->
-  <option value="">Select Status</option>
-  <option value="active">Active</option>
-  <option value="inactive">Inactive</option>
-</select>
+                  className="border p-2 rounded w-full"
+                  value={editClientData.status}
+                  onChange={(e) =>
+                    setEditClientData({ ...editClientData, status: e.target.value })
+                  }
+                  required
+                >
+                  <option value="">Select Status</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
                 <div className="flex items-center gap-4">
                   {(editClientData.avatarPreview || editClientData.avatar) && (
                     <Avatar className="h-12 w-12">
@@ -387,20 +405,27 @@ export default function ClientsPage() {
                         clientName: '',
                         email: '',
                         phone: '',
+                        status: '',
                         avatar: null,
                         avatarPreview: '',
                       });
                     }}
                     className="px-4 py-2 border rounded hover:bg-gray-100"
+                    disabled={editLoading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={editLoading}
-                    className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#0f1a31]"
+                    className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#0f1a31] flex items-center justify-center gap-2 min-w-[100px]"
                   >
-                    {editLoading ? 'Updating...' : 'Update'}
+                    {editLoading ? (
+                      <>
+                        <ClipLoader size={18} color="#ffffff" />
+                        Updating...
+                      </>
+                    ) : 'Update'}
                   </button>
                 </div>
               </form>
@@ -421,14 +446,21 @@ export default function ClientsPage() {
                 <button
                   onClick={() => setDeleteTarget(null)}
                   className="px-4 py-2 border rounded hover:bg-gray-100"
+                  disabled={deleting}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteClient}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center justify-center gap-2 min-w-[120px]"
+                  disabled={deleting}
                 >
-                  Confirm Delete
+                  {deleting ? (
+                    <>
+                      <ClipLoader size={18} color="#ffffff" />
+                      Deleting...
+                    </>
+                  ) : 'Confirm Delete'}
                 </button>
               </div>
             </div>
@@ -437,58 +469,69 @@ export default function ClientsPage() {
 
         {/* Client Table */}
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 border-b"></th>
-                <th className="p-3 border-b">Avatar</th>
-                <th className="p-3 border-b">Client Name</th>
-                <th className="p-3 border-b">Email</th>
-                <th className="p-3 border-b">Phone</th>
-                 <th className="p-3 border-b">Status</th>
-                <th className="p-3 border-b">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-  {clients.map((client) => (
-    <tr key={client._id} className="hover:bg-gray-50 transition">
-      <td className="p-3 border-b">{}</td>
-      <td className="p-3 border-b">
-        <Avatar className="h-8 w-8">
-          <AvatarImage src={client.avatar?.url || "https://github.com/shadcn.png"} />
-          <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
-        </Avatar>
-      </td>
-      <td className="p-3 border-b">{client.name}</td>
-      <td className="p-3 border-b">{client.email || 'N/A'}</td>
-      <td className="p-3 border-b">{client.phone || 'N/A'}</td>
-      <td className="p-3 border-b">
-        <span className={`px-2 py-1 rounded-full text-xs font-medium 
-          ${client.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-          {client.status || 'inactive'}
-        </span>
-      </td>
-      <td className="p-3 border-b">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => openEditModal(client)}
-            className="text-[#192232] hover:text-[#192443]"
-          >
-            <MdEdit />
-          </button>
-          <button
-            onClick={() => setDeleteTarget(client)}
-            className="text-red-600 hover:text-red-800"
-          >
-            <FaRegTrashAlt />
-          </button>
-        </div>
-      </td>
-    </tr>
-  ))}
-</tbody>
-
-          </table>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <ScaleLoader color="#192232" loading={loading} />
+            </div>
+          ) : clients.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500">No clients found</p>
+            </div>
+          ) : (
+            <table className="w-full border-collapse text-left text-sm">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="p-3 border-b"></th>
+                  <th className="p-3 border-b">Avatar</th>
+                  <th className="p-3 border-b">Client Name</th>
+                  <th className="p-3 border-b">Email</th>
+                  <th className="p-3 border-b">Phone</th>
+                  <th className="p-3 border-b">Status</th>
+                  <th className="p-3 border-b">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clients.map((client) => (
+                  <tr key={client._id} className="hover:bg-gray-50 transition">
+                    <td className="p-3 border-b">{}</td>
+                    <td className="p-3 border-b">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={client.avatar?.url || "https://github.com/shadcn.png"} />
+                        <AvatarFallback>{client.name?.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </td>
+                    <td className="p-3 border-b">{client.name}</td>
+                    <td className="p-3 border-b">{client.email || 'N/A'}</td>
+                    <td className="p-3 border-b">{client.phone || 'N/A'}</td>
+                    <td className="p-3 border-b">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium 
+                        ${client.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {client.status || 'inactive'}
+                      </span>
+                    </td>
+                    <td className="p-3 border-b">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEditModal(client)}
+                          className="text-[#192232] hover:text-[#192443]"
+                          disabled={loading}
+                        >
+                          <MdEdit />
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(client)}
+                          className="text-red-600 hover:text-red-800"
+                          disabled={loading}
+                        >
+                          <FaRegTrashAlt />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </main>
     </div>

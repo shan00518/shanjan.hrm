@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
+import { ClipLoader } from "react-spinners";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ProjectsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [client, setClient] = useState("");
-  const [clients, setClients] = useState([]); // State for clients list
+  const [clients, setClients] = useState([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [projects, setProjects] = useState([]);
   const [name, setName] = useState("");
@@ -21,6 +22,9 @@ export default function ProjectsPage() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [addLoading, setAddLoading] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  
   const [editProjectData, setEditProjectData] = useState({
     id: '',
     name: '',
@@ -29,11 +33,13 @@ export default function ProjectsPage() {
     startDate: '',
     endDate: '',
     status: 'in_progress',
+    client: ''
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         // Fetch projects
         const projectsRes = await fetch('/api/project/list');
         const projectsData = await projectsRes.json();
@@ -48,6 +54,8 @@ export default function ProjectsPage() {
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error("Failed to load data");
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
@@ -83,7 +91,7 @@ export default function ProjectsPage() {
         },
         body: JSON.stringify({
           client,
-          employees: [], // You can modify this to select employees if needed
+          employees: [],
           name,
           description,
           price: Number(price),
@@ -122,6 +130,7 @@ export default function ProjectsPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          client: editProjectData.client,
           name: editProjectData.name,
           description: editProjectData.description,
           price: Number(editProjectData.price),
@@ -169,6 +178,7 @@ export default function ProjectsPage() {
   const handleDeleteProject = async () => {
     if (!deleteTarget) return;
     
+    setDeleteLoading(true);
     try {
       const res = await fetch(`/api/project/delete/${deleteTarget._id}`, {
         method: "DELETE",
@@ -185,6 +195,8 @@ export default function ProjectsPage() {
     } catch (error) {
       console.error("Error deleting project:", error);
       toast.error(error.message || "Failed to delete project");
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -313,9 +325,14 @@ export default function ProjectsPage() {
                   <button
                     type="submit"
                     disabled={addLoading}
-                    className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#0f1a31]"
+                    className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#0f1a31] flex items-center justify-center gap-2 min-w-[100px]"
                   >
-                    {addLoading ? 'Saving...' : 'Save'}
+                    {addLoading ? (
+                      <>
+                        <ClipLoader size={18} color="#ffffff" />
+                        Saving...
+                      </>
+                    ) : 'Save'}
                   </button>
                 </div>
               </form>
@@ -329,21 +346,21 @@ export default function ProjectsPage() {
             <div className="bg-white p-6 rounded-lg shadow-2xl w-[90%] md:w-[500px]">
               <h2 className="text-lg font-semibold mb-4">Edit Project</h2>
               <form onSubmit={handleEditSubmit} className="space-y-2">
-                    <select
-          className="border p-2 rounded w-full"
-          value={editProjectData.client}
-          onChange={(e) =>
-            setEditProjectData({ ...editProjectData, client: e.target.value })
-          }
-          required
-        >
-          <option value="">Select Client</option>
-          {clients.map((client) => (
-            <option key={client._id} value={client._id}>
-              {client.name}
-            </option>
-          ))}
-        </select>
+                <select
+                  className="border p-2 rounded w-full"
+                  value={editProjectData.client}
+                  onChange={(e) =>
+                    setEditProjectData({ ...editProjectData, client: e.target.value })
+                  }
+                  required
+                >
+                  <option value="">Select Client</option>
+                  {clients.map((client) => (
+                    <option key={client._id} value={client._id}>
+                      {client.name}
+                    </option>
+                  ))}
+                </select>
                 <input
                   type="text"
                   placeholder="Project Name"
@@ -416,9 +433,14 @@ export default function ProjectsPage() {
                   <button
                     type="submit"
                     disabled={editLoading}
-                    className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#0f1a31]"
+                    className="bg-[#192443] text-white px-4 py-2 rounded hover:bg-[#0f1a31] flex items-center justify-center gap-2 min-w-[100px]"
                   >
-                    {editLoading ? 'Updating...' : 'Update'}
+                    {editLoading ? (
+                      <>
+                        <ClipLoader size={18} color="#ffffff" />
+                        Updating...
+                      </>
+                    ) : 'Update'}
                   </button>
                 </div>
               </form>
@@ -438,75 +460,90 @@ export default function ProjectsPage() {
               <div className="flex justify-center gap-4">
                 <button
                   onClick={() => setDeleteTarget(null)}
-                  className="px-4 py-2 border rounded hover:bg-gray-100"
+                  className="px-4 py-2 border rounded hover:bg-gray-100 min-w-[100px]"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteProject}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 flex items-center justify-center gap-2 min-w-[120px]"
                 >
-                  Confirm Delete
+                  {deleteLoading ? (
+                    <>
+                      <ClipLoader size={18} color="#ffffff" />
+                      Deleting...
+                    </>
+                  ) : 'Confirm Delete'}
                 </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Project Table */}
+        
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left text-sm">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="p-3 border-b">#</th>
-                <th className="p-3 border-b">Project Name</th>
-                <th className="p-3 border-b">Client</th>
-                <th className="p-3 border-b">Description</th>
-                <th className="p-3 border-b">Price</th>
-                <th className="p-3 border-b">Start Date</th>
-                <th className="p-3 border-b">End Date</th>
-                <th className="p-3 border-b">Status</th>
-                <th className="p-3 border-b">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {projects.map((project, index) => {
-                const projectClient = clients.find(c => c._id === project.client);
-                return (
-                  <tr key={project._id} className="hover:bg-gray-50 transition">
-                    <td className="p-3 border-b">{index + 1}</td>
-                    <td className="p-3 border-b">{project.name}</td>
-                    <td className="p-3 border-b">
-                      {projectClient ? projectClient.name : 'N/A'}
-                    </td>
-                    <td className="p-3 border-b">{project.description}</td>
-                    <td className="p-3 border-b">${project.price}</td>
-                    <td className="p-3 border-b">{formatDate(project.startDate)}</td>
-                    <td className="p-3 border-b">{formatDate(project.endDate)}</td>
-                    <td className="p-3 border-b">
-                      {getStatusBadge(project.status)}
-                    </td>
-                    <td className="p-3 border-b">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => openEditModal(project)}
-                          className="text-[#192232] hover:text-[#192443]"
-                        >
-                          <MdEdit />
-                        </button>
-                        <button
-                          onClick={() => setDeleteTarget(project)}
-                          className="text-red-600 hover:text-red-800"
-                        >
-                          <FaRegTrashAlt />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <ClipLoader size={40} color="#192232" />
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="text-center py-10">
+              <p className="text-gray-500">No projects found</p>
+            </div>
+          ) : (
+            <table className="w-full border-collapse text-left text-sm">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="p-3 border-b">#</th>
+                  <th className="p-3 border-b">Project Name</th>
+                  <th className="p-3 border-b">Client</th>
+                  <th className="p-3 border-b">Description</th>
+                  <th className="p-3 border-b">Price</th>
+                  <th className="p-3 border-b">Start Date</th>
+                  <th className="p-3 border-b">End Date</th>
+                  <th className="p-3 border-b">Status</th>
+                  <th className="p-3 border-b">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {projects.map((project, index) => {
+                  const projectClient = clients.find(c => c._id === project.client);
+                  return (
+                    <tr key={project._id} className="hover:bg-gray-50 transition">
+                      <td className="p-3 border-b">{index + 1}</td>
+                      <td className="p-3 border-b">{project.name}</td>
+                      <td className="p-3 border-b">
+                        {projectClient ? projectClient.name : 'N/A'}
+                      </td>
+                      <td className="p-3 border-b">{project.description}</td>
+                      <td className="p-3 border-b">${project.price}</td>
+                      <td className="p-3 border-b">{formatDate(project.startDate)}</td>
+                      <td className="p-3 border-b">{formatDate(project.endDate)}</td>
+                      <td className="p-3 border-b">
+                        {getStatusBadge(project.status)}
+                      </td>
+                      <td className="p-3 border-b">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => openEditModal(project)}
+                            className="text-[#192232] hover:text-[#192443]"
+                          >
+                            <MdEdit />
+                          </button>
+                          <button
+                            onClick={() => setDeleteTarget(project)}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            <FaRegTrashAlt />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </main>
     </div>

@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    import NextTopLoader from 'nextjs-toploader';
+
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+
 import LayoutWrapper from "../app/components/layout-wrapper/LayoutWrapper";
 
 const geistSans = Geist({

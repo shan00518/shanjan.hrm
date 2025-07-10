@@ -21,7 +21,7 @@ export default function ClientsPage() {
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key state
+  const [refreshKey, setRefreshKey] = useState(0); 
   const [searchTerm, setSearchTerm] = useState("");
 
 
@@ -100,7 +100,6 @@ export default function ClientsPage() {
 
 
 
-  // const startIndex = (activePage - 1) * pageSize;
   const paginatedInvoices = filteredInvoices.slice(startIndex, startIndex + pageSize);
   const totalPages = Math.ceil(filteredInvoices.length / pageSize);
 
