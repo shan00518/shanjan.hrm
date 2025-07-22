@@ -19,6 +19,12 @@ export default function ClientsPage() {
   const [loading, setLoading] = useState(true); // For initial data loading
   const [deleting, setDeleting] = useState(false); // For delete operation
 
+  const Spinner = () => (
+  <div className="flex justify-center items-center">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+  </div>
+);
+
   const [avatar, setAvatar] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState("");
   const [addLoading, setAddLoading] = useState(false);
@@ -237,11 +243,8 @@ export default function ClientsPage() {
             className="bg-[#192232] text-white px-4 py-1.5 rounded-lg hover:bg-[#192443] transition flex items-center gap-2"
             disabled={loading}
           >
-            {loading ? (
-              <ClipLoader size={18} color="#ffffff" />
-            ) : (
-              'Add Clients'
-            )}
+            Add Clients
+
           </button>
         </div>
 
@@ -317,7 +320,7 @@ export default function ClientsPage() {
                   >
                     {addLoading ? (
                       <>
-                        <ClipLoader size={18} color="#ffffff" />
+                        <Spinner size={48} color="#ffffff" />
                         Saving...
                       </>
                     ) : 'Save'}
@@ -422,7 +425,7 @@ export default function ClientsPage() {
                   >
                     {editLoading ? (
                       <>
-                        <ClipLoader size={18} color="#ffffff" />
+                        <Spinner size={48} color="#ffffff" />
                         Updating...
                       </>
                     ) : 'Update'}
@@ -457,7 +460,7 @@ export default function ClientsPage() {
                 >
                   {deleting ? (
                     <>
-                      <ClipLoader size={18} color="#ffffff" />
+                      <Spinner size={48} color="#ffffff" />
                       Deleting...
                     </>
                   ) : 'Confirm Delete'}
@@ -471,7 +474,7 @@ export default function ClientsPage() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="flex justify-center items-center h-64">
-              <ScaleLoader color="#192232" loading={loading} />
+              <Spinner color="#192232" loading={loading} />
             </div>
           ) : clients.length === 0 ? (
             <div className="text-center py-8">

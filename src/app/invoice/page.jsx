@@ -24,6 +24,13 @@ export default function ClientsPage() {
   const [refreshKey, setRefreshKey] = useState(0); 
   const [searchTerm, setSearchTerm] = useState("");
 
+  const Spinner = () => (
+  <div className="flex justify-center items-center">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+  </div>
+);
+
+
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -113,8 +120,7 @@ export default function ClientsPage() {
             <div className="flex flex-col items-center gap-4">
               {/* Dual Ring Spinner */}
               <div className="relative w-20 h-20">
-                <div className="absolute inset-0 rounded-full border-4 border-blue-400 border-t-transparent animate-spin-slow shadow-lg"></div>
-                <div className="absolute inset-3 rounded-full border-4 border-indigo-500 border-b-transparent animate-spin-fast shadow-inner"></div>
+                <Spinner />
               </div>
 
               {/* Optional Logo or Icon */}

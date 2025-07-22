@@ -25,6 +25,12 @@ export default function Timesheet() {
   const [status, setStatus] = useState("Present");
   const [deleteTarget, setDeleteTarget] = useState(null);
 
+    const Spinner = () => (
+  <div className="flex justify-center items-center">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+  </div>
+);
+
   // Pagination settings
   const recordsPerPage = 10;
   const startIndex = (activePage - 1) * recordsPerPage;
@@ -188,7 +194,7 @@ export default function Timesheet() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p>Loading timesheet data...</p>
+        <Spinner />
       </div>
     );
   }

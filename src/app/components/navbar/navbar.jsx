@@ -41,7 +41,7 @@ const Navbar = () => {
           
           <button
             onClick={handleLogout}
-            className="text-blue-600 font-semibold"
+            className="w-full bg-[#182131] text-white font-semibold p-3 rounded-lg flex justify-center items-center"
           >
             Logout
           </button>

@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 "use client";
 import React, { useState } from "react";
 import { FaSearch } from "react-icons/fa";
@@ -23,7 +16,14 @@ export default function Employees() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const Spinner = () => (
+  <div className="flex justify-center items-center">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+  </div>
+);
 
   const options = [
     {
@@ -225,32 +225,29 @@ console.log("currentEmployee", currentEmployee)
                   <th className="p-3">Action</th>
                 </tr>
               </thead>
-              <tbody>
-                {console.log("employees", employees)}
-                {employees.map((emp) => (
-                  <tr
-                    key={emp._id}
-                    className="border-b border-gray-200 text-sm hover:bg-gray-50"
-                  >
+               <tbody className="divide-y divide-gray-100">
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="py-6">
+                    <Spinner />
+                  </td>
+                </tr>
+              ) : employees.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="py-6 text-center text-gray-400">
+                    No employees found
+                  </td>
+                </tr>
+              ) : (
+                employees.map((emp) => (
+                  <tr key={emp._id} className="hover:bg-gray-50">
                     <td className="p-3">{emp.firstName} {emp.lastName}</td>
                     <td className="p-3">{emp.employeeCode}</td>
-                    <td className="p-3 hidden sm:table-cell">
-                      {emp.department}
-                    </td>
-                    <td className="p-3 hidden md:table-cell">
-                      {emp.designation}
-                    </td>
+                    <td className="p-3 hidden sm:table-cell">{emp.department}</td>
+                    <td className="p-3 hidden md:table-cell">{emp.designation}</td>
                     <td className="p-3">
-                      <span
-                        className={`font-semibold ${
-                          emp.isActive === true
-                            ? "text-green-600"
-                            : "text-yellow-600"
-                        }`}
-                      >
-                        { emp.isActive === true
-                            ? "Active"
-                            : "Leve"}
+                      <span className={`font-semibold ${emp.isActive ? "text-green-600" : "text-yellow-600"}`}>
+                        {emp.isActive ? "Active" : "Leave"}
                       </span>
                     </td>
                     <td className="p-3">
@@ -272,8 +269,9 @@ console.log("currentEmployee", currentEmployee)
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
+                ))
+              )}
+            </tbody>
             </table>
           </div>
 
