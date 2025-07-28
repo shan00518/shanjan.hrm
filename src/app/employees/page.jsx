@@ -20,10 +20,10 @@ export default function Employees() {
   const router = useRouter();
 
   const Spinner = () => (
-  <div className="flex justify-center items-center">
-    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
-  </div>
-);
+    <div className="flex justify-center items-center">
+      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+    </div>
+  );
 
   const options = [
     {
@@ -48,114 +48,103 @@ export default function Employees() {
     },
   ];
 
-  
-const [employees, setEmployees] = useState([]);    
+  const [employees, setEmployees] = useState([]);
 
-useEffect(() => {
-  const fetchEmployees = async () => {
-    try {
-      const res = await fetch("/api/employee/list");
-      if (!res.ok) {
-        throw new Error("Failed to fetch employees");
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const res = await fetch("/api/employee/list");
+        if (!res.ok) {
+          throw new Error("Failed to fetch employees");
+        }
+
+        const data = await res.json();
+        console.log("Fetched employees:", data.employees);
+
+        setEmployees(data.employees);
+      } catch (error) {
+        console.error("Error fetching employees:", error);
       }
+    };
 
-      const data = await res.json(); 
-      console.log("Fetched employees:", data.employees);
+    fetchEmployees();
+  }, []);
 
-      setEmployees(data.employees); 
-    } catch (error) {
-      console.error("Error fetching employees:", error);
-    }
+  const handleEdit = (employee) => {
+    console.log("azam", employee);
+    setCurrentEmployee(employee); // Populate modal
+    setEditModalOpen(true); // Show modal
   };
 
-  fetchEmployees();
-}, []);
+  const id = "685868f8ec837daef4c5a049";
 
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const formData = new FormData();
 
+      formData.append("firstName", currentEmployee.firstName);
+      formData.append("lastName", currentEmployee.lastName);
+      formData.append("employeeCode", currentEmployee.employeeCode);
+      formData.append("department", currentEmployee.department);
+      formData.append("designation", currentEmployee.designation);
+      formData.append("isActive", currentEmployee.isActive);
 
+      const res = await fetch(`/api/employee/update/${id}`, {
+        method: "PUT",
+        body: formData,
+      });
 
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update");
 
- 
-const handleEdit = (employee) => {
-  console.log("azam", employee)
-  setCurrentEmployee(employee); // Populate modal
-  setEditModalOpen(true);       // Show modal
-};
+      // Update local state
+      setEmployees((prev) =>
+        prev.map((emp) =>
+          emp._id === currentEmployee._id ? data.employee : emp
+        )
+      );
+      setEditModalOpen(false);
 
-
-const id ="685868f8ec837daef4c5a049"
-
-const handleUpdate = async (e) => {
-  e.preventDefault();
-  try {
-    const formData = new FormData();
-    
-    formData.append('firstName', currentEmployee.firstName);
-    formData.append('lastName', currentEmployee.lastName);
-    formData.append('employeeCode', currentEmployee.employeeCode);
-    formData.append('department', currentEmployee.department);
-    formData.append('designation', currentEmployee.designation);
-    formData.append('isActive', currentEmployee.isActive);
-    
-    
-    const res = await fetch(`/api/employee/update/${id}`, {
-      method: "PUT",
-      body: formData
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to update");
-
-    // Update local state
-    setEmployees(prev => 
-      prev.map(emp => 
-        emp._id === currentEmployee._id ? data.employee : emp
-      )
-    );
-    setEditModalOpen(false);
-    
-    // Show success message
-    toast.success("Employee updated successfully");
-  } catch (error) {
-    console.error("Error updating:", error);
-    toast.error("Failed to update employee");
-  }
-};
-const handleInputChange = (e) => {
-  const { name, value } = e.target;
-  setCurrentEmployee((prevEmployee) => ({
-    ...prevEmployee,
-    [name]: name === "isActive" ? value === "true" : value,
-  }));
-};
-
+      // Show success message
+      toast.success("Employee updated successfully");
+    } catch (error) {
+      console.error("Error updating:", error);
+      toast.error("Failed to update employee");
+    }
+  };
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentEmployee((prevEmployee) => ({
+      ...prevEmployee,
+      [name]: name === "isActive" ? value === "true" : value,
+    }));
+  };
 
   const handleDelete = (emp) => {
     setDeleteTarget(emp);
   };
 
- const confirmDelete = async () => {
-  if (!deleteTarget) return;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
 
-  try {
-    const res = await fetch(`/api/employee/delete/${deleteTarget._id}`, {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch(`/api/employee/delete/${deleteTarget._id}`, {
+        method: "DELETE",
+      });
 
-    if (!res.ok) {
-      throw new Error("Failed to delete employee");
+      if (!res.ok) {
+        throw new Error("Failed to delete employee");
+      }
+
+      setEmployees((prev) => prev.filter((e) => e._id !== deleteTarget._id));
+      setDeleteTarget(null);
+    } catch (error) {
+      console.error("Error deleting employee:", error);
     }
+  };
 
-    // Remove from local state after successful deletion
-    setEmployees((prev) => prev.filter((e) => e._id !== deleteTarget._id));
-    setDeleteTarget(null);
-  } catch (error) {
-    console.error("Error deleting employee:", error);
-  }
-};
-
-
-console.log("currentEmployee", currentEmployee)
+  console.log("currentEmployee", currentEmployee);
 
   return (
     <section className="w-[10] md:w-full min-h-screen bg-white pt-20 px-4 md:px-6 lg:pl-64 lg:pt-20">
@@ -208,8 +197,6 @@ console.log("currentEmployee", currentEmployee)
                   </div>
                 )}
               </div>
-
-           
             </div>
           </div>
 
@@ -225,164 +212,174 @@ console.log("currentEmployee", currentEmployee)
                   <th className="p-3">Action</th>
                 </tr>
               </thead>
-               <tbody className="divide-y divide-gray-100">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="py-6">
-                    <Spinner />
-                  </td>
-                </tr>
-              ) : employees.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-6 text-center text-gray-400">
-                    No employees found
-                  </td>
-                </tr>
-              ) : (
-                employees.map((emp) => (
-                  <tr key={emp._id} className="hover:bg-gray-50">
-                    <td className="p-3">{emp.firstName} {emp.lastName}</td>
-                    <td className="p-3">{emp.employeeCode}</td>
-                    <td className="p-3 hidden sm:table-cell">{emp.department}</td>
-                    <td className="p-3 hidden md:table-cell">{emp.designation}</td>
-                    <td className="p-3">
-                      <span className={`font-semibold ${emp.isActive ? "text-green-600" : "text-yellow-600"}`}>
-                        {emp.isActive ? "Active" : "Leave"}
-                      </span>
-                    </td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => handleEdit(emp)}
-                          className="text-gray-600 hover:text-gray-900"
-                          aria-label="Edit"
-                        >
-                          <RiPencilFill />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(emp)}
-                          className="text-red-600 hover:text-red-800"
-                          aria-label="Delete"
-                        >
-                          <FaRegTrashAlt />
-                        </button>
-                      </div>
+              <tbody className="divide-y divide-gray-100">
+                {loading ? (
+                  <tr>
+                    <td colSpan={6} className="py-6">
+                      <Spinner />
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
+                ) : employees.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-6 text-center text-gray-400">
+                      No employees found
+                    </td>
+                  </tr>
+                ) : (
+                  employees.map((emp) => (
+                    <tr key={emp._id} className="hover:bg-gray-50">
+                      <td className="p-3">
+                        {emp.firstName} {emp.lastName}
+                      </td>
+                      <td className="p-3">{emp.employeeCode}</td>
+                      <td className="p-3 hidden sm:table-cell">
+                        {emp.department}
+                      </td>
+                      <td className="p-3 hidden md:table-cell">
+                        {emp.designation}
+                      </td>
+                      <td className="p-3">
+                        <span
+                          className={`font-semibold ${
+                            emp.isActive ? "text-green-600" : "text-yellow-600"
+                          }`}
+                        >
+                          {emp.isActive ? "Active" : "Leave"}
+                        </span>
+                      </td>
+                      <td className="p-3">
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => handleEdit(emp)}
+                            className="text-gray-600 hover:text-gray-900"
+                            aria-label="Edit"
+                          >
+                            <RiPencilFill />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(emp)}
+                            className="text-red-600 hover:text-red-800"
+                            aria-label="Delete"
+                          >
+                            <FaRegTrashAlt />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
             </table>
           </div>
 
           {/* Edit Modal */}
           {editModalOpen && currentEmployee && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-    <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] max-w-md">
-      <h2 className="text-lg font-semibold mb-4">Edit Employee</h2>
-      <form onSubmit={handleUpdate} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            First Name
-          </label>
-          <input
-            type="text"
-            name="firstName"
-            value={currentEmployee.firstName || ''}
-            onChange={handleInputChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+              <div className="bg-white p-6 rounded-lg shadow-xl w-[90%] max-w-md">
+                <h2 className="text-lg font-semibold mb-4">Edit Employee</h2>
+                <form onSubmit={handleUpdate} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      First Name
+                    </label>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={currentEmployee.firstName || ""}
+                      onChange={handleInputChange}
+                      className="w-full border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Last Name
-          </label>
-          <input
-            type="text"
-            name="lastName"
-            value={currentEmployee.lastName || ''}
-            onChange={handleInputChange}
-            className="w-full border px-3 py-2 rounded"
-          />
-        </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Last Name
+                    </label>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={currentEmployee.lastName || ""}
+                      onChange={handleInputChange}
+                      className="w-full border px-3 py-2 rounded"
+                    />
+                  </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Employee ID
-          </label>
-          <input
-            type="text"
-            name="employeeCode"
-            value={currentEmployee.employeeCode || ''}
-            onChange={handleInputChange}
-            className="w-full border px-3 py-2 rounded"
-          />
-        </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Employee ID
+                    </label>
+                    <input
+                      type="text"
+                      name="employeeCode"
+                      value={currentEmployee.employeeCode || ""}
+                      onChange={handleInputChange}
+                      className="w-full border px-3 py-2 rounded"
+                    />
+                  </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Department
-          </label>
-          <input
-            type="text"
-            name="department"
-            value={currentEmployee.department || ''}
-            onChange={handleInputChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Department
+                    </label>
+                    <input
+                      type="text"
+                      name="department"
+                      value={currentEmployee.department || ""}
+                      onChange={handleInputChange}
+                      className="w-full border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Designation
-          </label>
-          <input
-            type="text"
-            name="designation"
-            value={currentEmployee.designation || ''}
-            onChange={handleInputChange}
-            className="w-full border px-3 py-2 rounded"
-            required
-          />
-        </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Designation
+                    </label>
+                    <input
+                      type="text"
+                      name="designation"
+                      value={currentEmployee.designation || ""}
+                      onChange={handleInputChange}
+                      className="w-full border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Status
-          </label>
-          <select
-            name="isActive"
-            value={currentEmployee.isActive ? "true" : "false"}
-            onChange={handleInputChange}
-            className="w-full border px-3 py-2 rounded"
-          >
-            <option value="true">Active</option>
-            <option value="false">Leave</option>
-          </select>
-        </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <select
+                      name="isActive"
+                      value={currentEmployee.isActive ? "true" : "false"}
+                      onChange={handleInputChange}
+                      className="w-full border px-3 py-2 rounded"
+                    >
+                      <option value="true">Active</option>
+                      <option value="false">Leave</option>
+                    </select>
+                  </div>
 
-        <div className="flex justify-end gap-3 pt-4">
-          <button
-            type="button"
-            onClick={() => setEditModalOpen(false)}
-            className="px-4 py-2 border rounded hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="bg-[#1F2937] text-white px-4 py-2 rounded"
-          >
-            Update
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
+                  <div className="flex justify-end gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setEditModalOpen(false)}
+                      className="px-4 py-2 border rounded hover:bg-gray-100"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-[#1F2937] text-white px-4 py-2 rounded"
+                    >
+                      Update
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* Delete Confirmation Modal */}
           {deleteTarget && (
@@ -415,5 +412,3 @@ console.log("currentEmployee", currentEmployee)
     </section>
   );
 }
-
-
