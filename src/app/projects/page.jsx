@@ -7,6 +7,14 @@ import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
+const Spinner = () => (
+  <div className="flex justify-center items-center">
+    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-700"></div>
+  </div>
+);
+
+
+
 export default function ProjectsPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [client, setClient] = useState("");
@@ -329,7 +337,7 @@ export default function ProjectsPage() {
                   >
                     {addLoading ? (
                       <>
-                        <ClipLoader size={18} color="#ffffff" />
+                        <Spinner size={18} color="#ffffff" />
                         Saving...
                       </>
                     ) : 'Save'}
@@ -437,7 +445,7 @@ export default function ProjectsPage() {
                   >
                     {editLoading ? (
                       <>
-                        <ClipLoader size={18} color="#ffffff" />
+                        <Spinner size={18} color="#ffffff" />
                         Updating...
                       </>
                     ) : 'Update'}
@@ -470,7 +478,7 @@ export default function ProjectsPage() {
                 >
                   {deleteLoading ? (
                     <>
-                      <ClipLoader size={18} color="#ffffff" />
+                      <Spinner size={18} color="#ffffff" />
                       Deleting...
                     </>
                   ) : 'Confirm Delete'}
@@ -484,7 +492,7 @@ export default function ProjectsPage() {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="flex justify-center items-center h-64">
-              <ClipLoader size={40} color="#192232" />
+              <Spinner size={40} color="#192232" />
             </div>
           ) : projects.length === 0 ? (
             <div className="text-center py-10">

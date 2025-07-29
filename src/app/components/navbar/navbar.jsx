@@ -27,7 +27,7 @@ const Navbar = () => {
   return (
     <header className="fixed top-0 left-0 right-0 z-30 w-full pl-4 md:pl-72 lg:pl-60 bg-white shadow-md">
       <div className="flex items-center justify-between px-4 py-3 md:px-6 lg:px-10">
-        <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md transition-all">
+        <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md  transition-all">
           <IoIosSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
           <input
             type="text"
@@ -41,7 +41,7 @@ const Navbar = () => {
           
           <button
             onClick={handleLogout}
-            className="text-blue-600 font-semibold"
+            className="w-full bg-[#182131] text-xs lg:text-sm ml-3  lg:ml-3 xl:ml-0 text-white font-semibold p-3 rounded-lg flex justify-center items-center"
           >
             Logout
           </button>
