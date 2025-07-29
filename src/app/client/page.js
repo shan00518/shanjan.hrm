@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
 import { toast } from "react-toastify";
-import { ClipLoader, ScaleLoader } from "react-spinners";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function ClientsPage() {

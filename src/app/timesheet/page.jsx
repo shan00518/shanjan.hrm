@@ -214,10 +214,10 @@ export default function Timesheet() {
       </aside>
 
       <main className="w-full md:w-[67%] lg:w-[73%] xl:w-[80%] 2xl:w-[82%] lg:ml-28 border-[1px] rounded-lg px-6 py-8 md:px- lg:px- xl:mx-aut mt-[100px] md:ml-26 lg:ml-26 xl:ml-12 2xl:ml-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <div className="flex flex-col sm:flex-row gap-4 w-full">
-            <div className="relative w-full sm:w-1/2 mb-4">
-              <div className="bg-white border-gray-200 p-4 rounded-xl">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center  xl:gap-4">
+          <div className="flex flex-col sm:flex-row xl:gap-4 w-full">
+            <div className="relative w-full sm:w-1/2 ">
+              <div className="bg-white border-gray-200 p-2 rounded-xl">
                 <div className="relative mb-4">
                   <FaSearch className="absolute top-4 left-3 text-gray-400 text-sm md:text-sm" />
                   <input
@@ -235,7 +235,7 @@ export default function Timesheet() {
               </div>
             </div>
             <div className="relative w-full sm:w-1/2 mb-4">
-              <div className="bg-white border-gray-200 p-4 rounded-xl">
+              <div className="bg-white border-gray-200 p-2 rounded-xl">
                 <div className="relative mb-4">
                   <FaCalendarAlt className="absolute top-4 left-3 text-gray-400 text-sm md:text-sm" />
                   <input
